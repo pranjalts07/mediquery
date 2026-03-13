@@ -10,6 +10,8 @@
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Click_Here-2563eb?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
 
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-mediquery--app.azurewebsites.net-2563eb?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
+
 <div align="center">
   <img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
 </div>
