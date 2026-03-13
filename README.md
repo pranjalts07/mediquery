@@ -12,7 +12,7 @@
 
 <div align="center">
 
-[![Try MediQuery Live](https://img.shields.io/badge/Try%20MediQuery%20Live-Click%20Here-%230f1117?style=for-the-badge&logo=microsoftazure&logoColor=white&labelColor=2563eb)](https://mediquery-app.azurewebsites.net)
+### [Click here to try MediQuery](https://mediquery-app.azurewebsites.net)
 
 </div>
 
@@ -22,7 +22,7 @@
 
 <br/>
 
-*Answers medical questions grounded in real research — not hallucinations*
+*Answers medical questions grounded in real research*
 
 </div>
 
