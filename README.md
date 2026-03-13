@@ -12,10 +12,11 @@
 
 <div align="center">
 
-### 🌐 [Click here to try MediQuery live →](https://mediquery-app.azurewebsites.net)
+<a href="https://mediquery-app.azurewebsites.net" target="_blank">
+  <img src="https://img.shields.io/badge/-%F0%9F%8C%90%20Try%20MediQuery%20Live-0f1117?style=for-the-badge&logoColor=white" alt="Live Demo" height="45"/>
+</a>
 
 </div>
-
 <div align="center">
   <img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
 </div>
