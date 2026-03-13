@@ -10,7 +10,7 @@
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
 
 
-[![Click Link](https://img.shields.io/badge/Click_Link-white?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
+[![Click Link](https://img.shields.io/badge/Click_Link-2563eb?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
 
 <br/><br/>
 
