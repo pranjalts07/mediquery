@@ -10,12 +10,7 @@
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
 
 
-<div align="center">
-  <a href="https://mediquery-app.azurewebsites.net">
-    <img src="images/demo_banner.svg" width="280"/>
-  </a>
-</div>
-
+[![Click Link](https://img.shields.io/badge/Click%20Link-Visit%20Live%20Demo-white?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
 <br/><br/>
 
 <img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
