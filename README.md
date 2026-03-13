@@ -4,7 +4,9 @@
 ### AI Medical Assistant — Powered by RAG
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Click_Here-2563eb?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
-
+<div align="center">
+  <img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
+</div>
 ![Python](https://img.shields.io/badge/Python-3.11-3776ab?style=flat-square&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![Pinecone](https://img.shields.io/badge/Pinecone-Vector_DB-6c47ff?style=flat-square)
