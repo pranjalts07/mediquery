@@ -11,9 +11,9 @@
 
 
 <div align="center">
-
-### [Click here to try MediQuery](https://mediquery-app.azurewebsites.net)
-
+  <a href="https://mediquery-app.azurewebsites.net">
+    <img src="images/demo_banner.svg" width="280"/>
+  </a>
 </div>
 
 <br/><br/>
