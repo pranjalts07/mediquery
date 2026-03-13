@@ -9,16 +9,18 @@
 ![HuggingFace](https://img.shields.io/badge/HuggingFace-Inference_API-ff9d00?style=flat-square&logo=huggingface&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
 
+
 <div align="center">
-  <a href="https://mediquery-app.azurewebsites.net">
-    <img src="images/demo_banner.svg" alt="click Link" width="320"/>
-  </a>
-</div>
+
+[![Try MediQuery Live](https://img.shields.io/badge/Try%20MediQuery%20Live-Click%20Here-%230f1117?style=for-the-badge&logo=microsoftazure&logoColor=white&labelColor=2563eb)](https://mediquery-app.azurewebsites.net)
 
 </div>
-<div align="center">
-  <img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
-</div>
+
+<br/><br/>
+
+<img src="images/image1.png" alt="MediQuery Screenshot" width="800"/>
+
+<br/>
 
 *Answers medical questions grounded in real research — not hallucinations*
 
