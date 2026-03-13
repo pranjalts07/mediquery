@@ -1,0 +1,50 @@
+# Environment
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Azure
+.azure/
+local.settings.json
+
+# Logs
+*.log
+logs/
+
+# Test artefacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.zip
+
+# Eval outputs
+mediquery_eval_*.json
+
+# Intermediate data files (only combined_knowledge.jsonl and sample_knowledge.jsonl are needed)
+data/pubmed_knowledge.jsonl
+data/pubmed_knowledge_new.jsonl
+data/knowledge_base.jsonl
