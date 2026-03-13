@@ -8,13 +8,12 @@
 ![Pinecone](https://img.shields.io/badge/Pinecone-Vector_DB-6c47ff?style=flat-square)
 ![HuggingFace](https://img.shields.io/badge/HuggingFace-Inference_API-ff9d00?style=flat-square&logo=huggingface&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Click_Here-2563eb?style=for-the-badge)](https://mediquery-app.azurewebsites.net)
 
 <div align="center">
-
-<a href="https://mediquery-app.azurewebsites.net" target="_blank">
-  <img src="https://img.shields.io/badge/-%F0%9F%8C%90%20Try%20MediQuery%20Live-0f1117?style=for-the-badge&logoColor=white" alt="Live Demo" height="45"/>
-</a>
+  <a href="https://mediquery-app.azurewebsites.net">
+    <img src="images/demo_banner.svg" alt="click Link" width="320"/>
+  </a>
+</div>
 
 </div>
 <div align="center">
