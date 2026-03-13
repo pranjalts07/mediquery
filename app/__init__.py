@@ -1,0 +1,1 @@
+# MediQuery application package

@@ -1,0 +1,28 @@
+# MediQuery — production requirements
+# Python 3.11 | Azure Linux App Service
+#
+# Design principles:
+#   - NO torch, transformers, sentence-transformers (local) → avoids Azure Oryx 10GB storage limit
+#   - NO LangChain → eliminates the #1 source of breaking changes and dependency conflicts
+#   - All ML inference is remote (HF Inference API) → lightweight, fast cold-start
+#   - All versions pinned for reproducible Azure builds
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+gunicorn==23.0.0
+
+# HTTP client (replaces requests — async-ready, used for HF API calls)
+httpx==0.27.2
+
+# Templating (serves chat.html)
+jinja2==3.1.4
+
+# Pinecone vector database client (v3 — no gRPC required)
+pinecone==5.3.1
+
+# Request validation
+pydantic==2.10.3
+
+# Env var loading (local dev only; Azure uses App Settings)
+python-dotenv==1.0.1
