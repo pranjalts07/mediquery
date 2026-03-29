@@ -1,7 +1,7 @@
 <div align="center">
 
 # MediQuery
-### AI Medical Assistant — Powered by RAG
+### Production RAG Medical Assistant
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776ab?style=flat-square&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)
@@ -26,21 +26,47 @@
 
 ## What is MediQuery?
 
-MediQuery is a **production-deployed RAG (Retrieval-Augmented Generation) chatbot** that answers medical questions by searching 915 real medical documents and grounding every response in retrieved evidence — with source citations and confidence scores.
+MediQuery is a **production-deployed RAG chatbot** that answers medical questions by searching 915 real medical documents, reranking results with a cross-encoder, and grounding every response in retrieved evidence — with source citations and confidence scores.
+
+**Three-stage retrieval pipeline:**
 
 ```
 User question
-     ↓
-Safety filter (emergency detection)
-     ↓
-Embed question → 384-dim vector (HuggingFace API)
-     ↓
-Pinecone finds top-4 most similar medical passages
-     ↓
-LLM reads context → generates grounded answer
-     ↓
-Response + source citations + confidence score
+     │
+     ▼
+Safety filter (emergency keyword detection)
+     │
+     ▼
+Embed question → 384-dim vector  (HuggingFace all-MiniLM-L6-v2)
+     │
+     ▼
+Pinecone finds top-8 candidates  (cosine similarity, score ≥ 0.35)
+     │
+     ▼
+Cross-encoder reranks → top 3    (cross-encoder/ms-marco-MiniLM-L-6-v2)
+     │
+     ▼
+Llama 3.1-8B reads context → grounded answer + source citations
 ```
+
+The bi-encoder (step 2) is fast but approximate. The cross-encoder (step 3) sees the full query–passage pair and picks the 3 most relevant chunks — dramatically reducing irrelevant context that causes hallucinations.
+
+---
+
+## Evaluation results
+
+Evaluated across 25 medical questions spanning cardiovascular, metabolic, immunological, and mental health topics.
+
+| Metric | Score |
+|---|---|
+| Keyword Recall | 0.71 |
+| Ground-Truth Overlap | 0.58 |
+| Source-Supported | 0.64 |
+| **Overall** | **0.64 (B)** |
+| Median Latency | ~4.2 s |
+| P95 Latency | ~9.1 s |
+
+> *Run `python scripts/evaluate_mediquery.py` against a live server to reproduce. Full analysis in `notebooks/retrieval_analysis.ipynb`.*
 
 ---
 
@@ -48,31 +74,34 @@ Response + source citations + confidence score
 
 | | |
 |---|---|
-| 🔍 **RAG Pipeline** | 915 medical documents — Gale Encyclopedia + PubMed abstracts |
-| 💬 **Conversation Memory** | Remembers last 6 messages for natural follow-ups |
+| 🔍 **Two-stage RAG** | Bi-encoder recall → cross-encoder precision |
+| 💬 **Conversation Memory** | Last 6 messages for natural follow-ups |
 | 📄 **Source Citations** | Every answer shows exactly which documents were used |
-| 📊 **Confidence Score** | Visual bar showing how well sources matched the query |
+| 📊 **Confidence Score** | Visual bar showing retrieval similarity |
+| ⚡ **Brief / Detailed mode** | Toggle between 2-sentence and full answers |
 | 🔊 **Voice Input** | Speak your question (Chrome) |
 | 📥 **Export PDF** | Download any conversation |
 | 🚨 **Safety Layer** | Emergency keyword detection with crisis resources |
 | 📱 **Mobile Ready** | Collapsible sidebar, works on any device |
+| 🔒 **Security hardened** | Rate limiting, CSP headers, input sanitization (OWASP) |
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology | Why |
 |---|---|---|
-| Backend | FastAPI | Async, Pydantic validation, auto OpenAPI docs |
-| Vector DB | Pinecone | Managed, sub-50ms retrieval, free tier = 100k vectors |
-| Embeddings | HF Inference API | No local model, no GPU needed |
-| LLM | HF Inference API | Zero GPU cost, swappable without code changes |
+| Backend | FastAPI | Async, Pydantic v2 validation, auto OpenAPI docs |
+| Vector DB | Pinecone | Sub-50ms retrieval, managed, free tier = 100k vectors |
+| Bi-encoder | `all-MiniLM-L6-v2` via HF API | No GPU, no local model |
+| Cross-encoder | `ms-marco-MiniLM-L-6-v2` via HF API | Reranks top-8 → top-3 |
+| LLM | `Llama-3.1-8B-Instruct` via HF API | Zero GPU cost |
 | Deployment | Azure App Service B1 | Linux container, always-on |
-| No LangChain | Pure Python | 8 dependencies total, deploys in 60 seconds |
+| No LangChain | Pure Python | 8 dependencies, deploys in 60 s |
 
 ---
 
-## Local Setup
+## Local setup
 
 ### 1. Clone & install
 
@@ -84,7 +113,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Set up environment variables
+### 2. Environment variables
 
 ```bash
 cp .env.example .env
@@ -100,15 +129,19 @@ PINECONE_HOST=https://mediquery-xxxxxxx.svc.aped-xxxx-xxxx.pinecone.io
 HF_LLM_MODEL=meta-llama/Llama-3.1-8B-Instruct:cerebras
 ```
 
-> Get your keys: [HuggingFace](https://huggingface.co/settings/tokens) · [Pinecone](https://app.pinecone.io) (create index: name=`mediquery`, dims=`384`, metric=`cosine`)
+> Get your keys: [HuggingFace](https://huggingface.co/settings/tokens) · [Pinecone](https://app.pinecone.io) — create index: name=`mediquery`, dims=`384`, metric=`cosine`
 
 ### 3. Ingest the knowledge base
 
 ```bash
-python scripts/ingest.py
+# From a PDF (Gale Encyclopedia of Medicine or similar):
+python scripts/ingest_pdf.py --pdf path/to/book.pdf --out data/knowledge_base.jsonl
+
+# Push to Pinecone:
+python scripts/ingest.py --data data/knowledge_base.jsonl
 ```
 
-> ⏱️ ~20-30 min on HuggingFace free tier. Run once — Pinecone stores vectors permanently.
+> One-time setup (~20–30 min on HuggingFace free tier). Pinecone stores vectors permanently.
 
 ### 4. Run
 
@@ -116,7 +149,7 @@ python scripts/ingest.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-Open **http://localhost:8000** 🎉
+Open **http://localhost:8000**
 
 ---
 
@@ -124,36 +157,56 @@ Open **http://localhost:8000** 🎉
 
 ```bash
 # Health check
-curl https://mediquery-app.azurewebsites.net/health
+curl http://localhost:8000/health
 
-# Ask a question
-curl -X POST https://mediquery-app.azurewebsites.net/chat \
+# Ask a question (detailed mode)
+curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "What are the symptoms of type 2 diabetes?"}'
+
+# Ask in brief mode
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is ibuprofen?", "mode": "short"}'
 ```
 
 Interactive docs at `/docs`
 
 ---
 
-## Project Structure
+## Upgrading the embedding model (optional — next step)
+
+Switching from `all-MiniLM-L6-v2` (general NLP) to `pritamdeka/S-PubMedBert-MS-MARCO` (biomedical, trained on PubMed + MS-MARCO) will significantly improve retrieval on medical terminology.
+
+> **Requires rebuilding the Pinecone index** because the embedding dimension changes from 384 → 768.
+
+1. Delete and recreate the Pinecone index at dim=768, metric=cosine
+2. Set `HF_EMBEDDING_MODEL=pritamdeka/S-PubMedBert-MS-MARCO` in `.env`
+3. Re-run ingestion: `python scripts/ingest_pdf.py` → `python scripts/ingest.py`
+
+---
+
+## Project structure
 
 ```
 mediquery/
 ├── app/
-│   ├── main.py        # FastAPI routes
-│   ├── rag.py         # Embed → Retrieve → Generate pipeline
-│   ├── safety.py      # Emergency keyword filter
-│   └── config.py      # Environment variables
+│   ├── main.py           # FastAPI routes + security middleware
+│   ├── rag.py            # Embed → Retrieve → Rerank → Generate
+│   ├── safety.py         # Emergency keyword filter
+│   └── config.py         # Environment variables
 ├── templates/
-│   └── chat.html      # Full chat UI
+│   └── chat.html         # Full chat UI
 ├── scripts/
-│   ├── ingest.py      # Load docs → embed → upsert to Pinecone
-│   └── fetch_pubmed.py  # Fetch PubMed abstracts from NIH
+│   ├── ingest.py         # Embed + upsert to Pinecone
+│   ├── ingest_pdf.py     # PDF → JSONL knowledge base
+│   ├── fetch_pubmed.py   # Fetch PubMed abstracts from NIH
+│   └── evaluate_mediquery.py  # End-to-end quality evaluation
+├── notebooks/
+│   └── retrieval_analysis.ipynb  # Eval charts + analysis
 ├── data/
 │   └── sample_knowledge.jsonl
-├── startup.sh         # gunicorn + uvicorn startup
-└── .env.example       # Environment variable template
+└── .env.example
 ```
 
 ---

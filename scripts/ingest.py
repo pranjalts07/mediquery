@@ -56,25 +56,35 @@ EMBED_URL = f"https://router.huggingface.co/hf-inference/models/{HF_EMBEDDING_MO
 # ── Embedding ─────────────────────────────────────────────────────────────────
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
+    """
+    Embed a batch of texts in a single HF Inference API call.
+
+    The feature-extraction API accepts a list of strings and returns a list
+    of vectors in one round-trip, which is far faster than one call per text.
+    The outer batch loop in main() keeps individual payloads to a manageable
+    size (default: 16 texts) so we don't hit request size or timeout limits.
+    """
     headers = {
         "Authorization": f"Bearer {HF_API_TOKEN}",
         "Content-Type": "application/json",
     }
-    embeddings = []
-    with httpx.Client(timeout=60.0) as client:
-        for text in texts:
-            payload = {"inputs": text, "options": {"wait_for_model": True}}
-            resp = client.post(EMBED_URL, json=payload, headers=headers)
-            if resp.status_code != 200:
-                logger.error("Embedding API error %s: %s", resp.status_code, resp.text[:300])
-                raise RuntimeError(f"HF Inference API returned {resp.status_code}")
-            result = resp.json()
-            if isinstance(result, list) and isinstance(result[0], list):
-                embeddings.append(result[0])
-            else:
-                embeddings.append(result)
-            time.sleep(0.1)
-    return embeddings
+    payload = {"inputs": texts, "options": {"wait_for_model": True}}
+
+    with httpx.Client(timeout=120.0) as client:
+        resp = client.post(EMBED_URL, json=payload, headers=headers)
+
+    if resp.status_code != 200:
+        logger.error("Embedding API error %s: %s", resp.status_code, resp.text[:300])
+        raise RuntimeError(f"HF Inference API returned {resp.status_code}")
+
+    result = resp.json()
+    # Batch input → list of vectors: [[0.1, ...], [0.2, ...], ...]
+    if isinstance(result, list) and result and isinstance(result[0], list):
+        return result
+    # Single-text fallback → one vector (shouldn't happen with list input, but be safe)
+    if isinstance(result, list) and result and isinstance(result[0], float):
+        return [result]
+    raise ValueError(f"Unexpected embedding response shape: {type(result)}")
 
 
 # ── Pinecone upsert ───────────────────────────────────────────────────────────
