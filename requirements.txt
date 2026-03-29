@@ -26,3 +26,6 @@ pydantic==2.10.3
 
 # Env var loading (local dev only; Azure uses App Settings)
 python-dotenv==1.0.1
+
+# Rate limiting — per-IP, per-endpoint (OWASP API4:2023)
+slowapi==0.1.9

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="google-site-verification" content="lj24gGGhbhiuWoSDHbFQY3e4m0bP-wkhDTQ1ewzo02A" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MediQuery</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -237,6 +238,10 @@ body {
 .input-outer { background: var(--surface); border-top: 1px solid var(--border); }
 .input-wrapper { max-width: 800px; margin: 0 auto; padding: 13px 44px 17px; }
 .disclaimer { font-size: 11px; color: #d1d5db; text-align: center; margin-bottom: 9px; }
+.mode-toggle { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+.mode-btn { padding: 4px 14px; font-size: 11px; font-weight: 500; border-radius: 100px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.15s; }
+.mode-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.mode-btn:not(.active):hover { background: var(--bg); color: var(--text); }
 .input-row { display: flex; gap: 9px; align-items: flex-end; }
 textarea { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 11px; padding: 11px 14px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; resize: none; outline: none; transition: border-color 0.18s, box-shadow 0.18s; min-height: 46px; max-height: 120px; line-height: 1.5; }
 textarea::placeholder { color: #9ca3af; }
@@ -406,6 +411,10 @@ textarea:focus { border-color: rgba(37,99,235,0.28); box-shadow: 0 0 0 3px rgba(
     <div class="input-outer">
       <div class="input-wrapper">
         <div class="disclaimer">Not a doctor. Always check with a real one for anything personal.</div>
+        <div class="mode-toggle">
+          <button class="mode-btn" id="modeBrief" onclick="setMode('short')">Brief</button>
+          <button class="mode-btn active" id="modeDetailed" onclick="setMode('detailed')">Detailed</button>
+        </div>
         <div class="input-row">
           <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input (Chrome only)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
@@ -448,7 +457,13 @@ let chats = loadChats();
 let activeChatId = null;
 let isLoading = false;
 let sidebarCollapsed = false;
+let responseMode = 'detailed';
 function genId() { return 'chat_' + Date.now(); }
+function setMode(m) {
+  responseMode = m;
+  document.getElementById('modeBrief').classList.toggle('active', m === 'short');
+  document.getElementById('modeDetailed').classList.toggle('active', m === 'detailed');
+}
 
 // ── Sidebar toggle ─────────────────────────────────────────────────────────────
 function toggleSidebar() {
@@ -560,7 +575,7 @@ function buildSourcesHTML(sources) {
     const text = typeof s === 'object' ? (s.text || '') : '';
     return `<span class="source-badge" onclick="openSourceModal(this)" data-source="${escHtml(name)}" data-score="${score}" data-text="${escHtml(text)}">📄 ${escHtml(name)}</span>`;
   }).join('');
-  return `<div class="confidence-row"><span class="confidence-label">Confidence</span><div class="confidence-bar-outer"><div class="confidence-bar-inner ${cls}" style="width:${pct}%"></div></div><span class="confidence-pct">${pct}%</span></div><div class="sources-row">${badges}</div>`;
+  return `<div class="confidence-row"><span class="confidence-label">Source match</span><div class="confidence-bar-outer"><div class="confidence-bar-inner ${cls}" style="width:${pct}%"></div></div><span class="confidence-pct">${pct}%</span></div><div class="sources-row">${badges}</div>`;
 }
 function buildMessageHTML(msg) {
   const isBot = msg.role === 'bot';
@@ -695,6 +710,40 @@ function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(e
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 function askSuggestion(btn) { document.getElementById('userInput').value = btn.textContent; sendMessage(); }
 
+// ── Streaming helpers ─────────────────────────────────────────────────────────
+const BOT_AVATAR_SVG = `<div class="msg-avatar bot"><svg width="15" height="15" viewBox="0 0 100 100" fill="none"><line x1="50" y1="8" x2="50" y2="92" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M50 25 Q62 30 60 38 Q58 46 50 48 Q42 50 40 58 Q38 66 50 70" stroke="#60a5fa" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M50 25 Q38 30 40 38 Q42 46 50 48 Q58 50 60 58 Q62 66 50 70" stroke="#a78bfa" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="11" r="6" fill="#fff"/></svg></div>`;
+
+function createStreamBubble() {
+  document.getElementById('emptyState')?.remove();
+  const container = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'message-row bot';
+  row.innerHTML = `${BOT_AVATAR_SVG}<div class="msg-bubble bot"><span class="tw-content"></span><span class="cursor"></span></div>`;
+  container.appendChild(row);
+  scrollToBottom();
+  return {
+    row,
+    bubble:      row.querySelector('.msg-bubble'),
+    contentSpan: row.querySelector('.tw-content'),
+    cursor:      row.querySelector('.cursor'),
+  };
+}
+
+function finalizeStreamBubble(el, fullText, sources) {
+  el.cursor.remove();
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy-btn';
+  copyBtn.textContent = 'Copy';
+  copyBtn.setAttribute('data-text', fullText);
+  copyBtn.onclick = function() { copyMsg(this); };
+  el.bubble.insertBefore(copyBtn, el.bubble.firstChild);
+  if (sources?.length) {
+    const d = document.createElement('div');
+    d.innerHTML = buildSourcesHTML(sources);
+    while (d.firstChild) el.bubble.appendChild(d.firstChild);
+  }
+}
+
 // ── Send ──────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   if (isLoading) return;
@@ -707,17 +756,95 @@ async function sendMessage() {
   input.value = ''; input.style.height = 'auto';
   appendMessage('user', message);
   showTyping();
+
   const allMsgs = chats[activeChatId].messages;
-  const history = allMsgs.slice(-9, -1).map(m => ({ role: m.role === 'bot' ? 'assistant' : m.role, content: m.content }));
+  const history = allMsgs.slice(-9, -1).map(m => ({
+    role: m.role === 'bot' ? 'assistant' : m.role,
+    content: m.content,
+  }));
+
+  let streamEl = null;
+  let fullText = '';
+
   try {
-    const res = await fetch('/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, history }) });
-    const data = await res.json();
-    removeTyping();
-    typewriterAppend('bot', data.error ? 'Something went wrong. Please try again.' : data.answer, data.sources || []);
+    const res = await fetch('/chat/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, history, mode: responseMode }),
+    });
+
+    if (res.status === 429) {
+      removeTyping();
+      typewriterAppend('bot', "You're sending messages too quickly. Please wait a moment and try again.", []);
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      input.focus();
+      return;
+    }
+
+    if (!res.ok || !res.body) {
+      removeTyping();
+      typewriterAppend('bot', 'Something went wrong. Please try again.', []);
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      input.focus();
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE events are separated by double newline
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop(); // keep any incomplete trailing chunk
+
+      for (const part of parts) {
+        for (const line of part.split('\n')) {
+          if (!line.startsWith('data: ')) continue;
+          let event;
+          try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+          if (event.type === 'token') {
+            if (!streamEl) {
+              removeTyping();
+              streamEl = createStreamBubble();
+            }
+            fullText += event.content;
+            streamEl.contentSpan.innerHTML = fmt(fullText);
+            scrollToBottom();
+          } else if (event.type === 'error') {
+            if (!streamEl) { removeTyping(); streamEl = createStreamBubble(); }
+            fullText = event.content;
+            streamEl.contentSpan.innerHTML = fmt(fullText);
+          } else if (event.type === 'done') {
+            if (!streamEl) { removeTyping(); streamEl = createStreamBubble(); }
+            finalizeStreamBubble(streamEl, fullText, event.sources || []);
+            chats[activeChatId].messages.push({
+              role: 'bot', content: fullText, sources: event.sources || [],
+            });
+            saveChats();
+            scrollToBottom();
+          }
+        }
+      }
+    }
+
   } catch {
     removeTyping();
-    typewriterAppend('bot', 'Connection error. Make sure the server is running.', []);
+    if (streamEl) {
+      finalizeStreamBubble(streamEl, fullText || 'Connection error. Make sure the server is running.', []);
+    } else {
+      typewriterAppend('bot', 'Connection error. Make sure the server is running.', []);
+    }
   }
+
   isLoading = false;
   document.getElementById('sendBtn').disabled = false;
   input.focus();
@@ -725,6 +852,9 @@ async function sendMessage() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 renderSidebar();
+// Warm up the server connection on page load so the first query isn't delayed
+// by a cold-start Pinecone reconnect or HF model load.
+fetch('/health').catch(() => {});
 </script>
 </body>
 </html>

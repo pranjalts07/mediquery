@@ -134,7 +134,7 @@ def chunk_text(text: str, chunk_size: int, overlap: int) -> list[str]:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def main(pdf_path: str, out_path: str) -> None:
+def main(pdf_path: str, out_path: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> None:
     path = Path(pdf_path)
     if not path.exists():
         logger.error("PDF not found: %s", path)
@@ -168,8 +168,8 @@ def main(pdf_path: str, out_path: str) -> None:
     )
 
     # Chunk
-    chunks = chunk_text(full_text, CHUNK_SIZE, CHUNK_OVERLAP)
-    logger.info("Generated %d chunks (size=%d, overlap=%d)", len(chunks), CHUNK_SIZE, CHUNK_OVERLAP)
+    chunks = chunk_text(full_text, chunk_size, overlap)
+    logger.info("Generated %d chunks (size=%d, overlap=%d)", len(chunks), chunk_size, overlap)
 
     # Write JSONL
     written = 0
@@ -219,9 +219,4 @@ if __name__ == "__main__":
         help=f"Word overlap between chunks (default: {CHUNK_OVERLAP})",
     )
     args = parser.parse_args()
-
-    # Allow CLI overrides
-    CHUNK_SIZE_FINAL = args.chunk_size
-    CHUNK_OVERLAP_FINAL = args.overlap
-
-    main(args.pdf, args.out)
+    main(args.pdf, args.out, chunk_size=args.chunk_size, overlap=args.overlap)
