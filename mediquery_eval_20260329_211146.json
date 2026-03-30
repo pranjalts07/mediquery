@@ -1,0 +1,375 @@
+{
+  "timestamp": "2026-03-29T21:11:46.876731",
+  "target_url": "https://mediquery-app.azurewebsites.net",
+  "mode": "detailed",
+  "total_queries": 25,
+  "successful_queries": 13,
+  "success_rate": 0.52,
+  "latency_stats": {
+    "min_ms": 1109.4,
+    "median_ms": 1277.8,
+    "mean_ms": 3459.1,
+    "p95_ms": 29678.5
+  },
+  "quality_scores": {
+    "keyword_recall": 0.614,
+    "ground_truth_overlap": 0.956,
+    "source_supported": 0.418,
+    "semantic_similarity": 0.746
+  },
+  "overall_score": 0.684,
+  "grade": "B",
+  "per_query": [
+    {
+      "question": "my doctor said i have high blood pressure, what does that actually mean and why is it bad?",
+      "category": "cardiovascular",
+      "ground_truth": "Hypertension is persistently elevated blood pressure above 130/80 mmHg. Risk factors include obesity, high sodium diet, physical inactivity, smoking, alcohol, family history, and stress. It increases risk of heart attack, stroke, and kidney disease.",
+      "answer": "High blood pressure, also known as hypertension, is when the pressure in your blood vessels is too high. Think of it like a garden hose with water flowing through it. When the water pressure is too high, the hose can get damaged, and that's kind of what's happening with your blood vessels when you have high blood pressure.\n\nThe pressure in your blood vessels is measured in two numbers: the top number, called systolic pressure, and the bottom number, called diastolic pressure. When your systolic pressure is too high, it's like the water pressure in that hose is too strong, and it can cause damage to your blood vessels over time.\n\nNow, high blood pressure can be bad because it increases your risk of having serious health problems, like heart attacks, strokes, and kidney disease. It's like the damage to your blood vessels can spread to other parts of your body, making it harder for your heart and other organs to function properly.\n\nThe good news is that high blood pressure is often treatable with medication, lifestyle changes, or a combination of both. Your doctor will work with you to find the right treatment plan to help lower your blood pressure and reduce your risk of these serious health problems.",
+      "latency_ms": 1613.7,
+      "sources": [
+        {
+          "source": "[Hypertension in the elderly]. \u2014 PMID 17195607 | Plouin PF, Rossignol P, Bobrie G. Bulletin de l'Academie nationale de medecine. 2006",
+          "score": 0.501
+        },
+        {
+          "source": "Global Hypertension Practice Guidelines \u2014 PMID 33268196 | Hypertension. 2020",
+          "score": 0.4818
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.479
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.833,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.511,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "whats the difference between the two numbers they always measure in blood pressure",
+      "category": "cardiovascular",
+      "ground_truth": "Systolic blood pressure is the pressure when the heart beats and pumps blood. Diastolic is the pressure when the heart rests between beats. Normal is below 120/80 mmHg.",
+      "answer": "When we talk about blood pressure, we're usually measuring two numbers: the systolic pressure and the diastolic pressure. The systolic pressure is the first number, and it's the pressure in your blood vessels when your heart beats. Think of it like the surge of water in a hose when the faucet is turned on - it's the initial burst of pressure.\n\nThe diastolic pressure is the second number, and it's the pressure in your blood vessels between beats, when your heart is resting. It's like the steady flow of water in the hose when the faucet is turned off - it's the ongoing pressure.\n\nTo put it simply, the systolic pressure is like the peak pressure, and the diastolic pressure is like the steady pressure. Both numbers are important because they give us a complete picture of your blood pressure.",
+      "latency_ms": 1295.7,
+      "sources": [
+        {
+          "source": "Thinking beyond new clinical guidelines: update in hypertension. \u2014 PMID 25659243 | Griffin BR, Schinstock CA. Mayo Clinic proceedings. 2015",
+          "score": 0.5346
+        },
+        {
+          "source": "Lack of adherence to hypertension treatment guidelines among GPs in southern Sweden-a case report-based survey. \u2014 PMID 22536853 | Ekesbo R, Midl\u00f6v P, Gerward S et al.. BMC family practice. 2012",
+          "score": 0.4472
+        },
+        {
+          "source": "Global Hypertension Practice Guidelines \u2014 PMID 33268196 | Hypertension. 2020",
+          "score": 0.4418
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.433,
+        "semantic_similarity": 0.738
+      }
+    },
+    {
+      "question": "i keep hearing about bad cholesterol, can you explain what ldl actually does",
+      "category": "cardiovascular",
+      "ground_truth": "LDL cholesterol carries fat from the liver to cells. High LDL causes plaque buildup in artery walls leading to atherosclerosis, increasing risk of heart attack and stroke.",
+      "answer": "LDL, or \"bad\" cholesterol, is a type of cholesterol that's found in the blood. It's called \"bad\" because high levels of it can increase the risk of atherosclerosis, which is a condition where plaque builds up in the artery walls. This can lead to all sorts of problems, including heart disease and strokes.\n\nThink of LDL as a delivery truck that carries cholesterol to different parts of the body. When there's too much LDL in the blood, it can start to deliver cholesterol to the wrong places, like the artery walls. Over time, this can cause the walls to become thick and stiff, making it harder for blood to flow through.\n\nLDL is different from HDL, or \"good\" cholesterol, which helps to remove excess cholesterol from the blood and transport it to the liver for disposal. So, while LDL is like a delivery truck, HDL is more like a garbage truck that helps to clean up the cholesterol that's already in the blood.\n\nIt's worth noting that LDL is just one part of the overall picture when it comes to heart health. Other factors, like triglyceride levels and blood pressure, also play a role in determining your risk for heart disease. But LDL is an important one to keep an eye on, and making sure your levels are in a healthy range can help to reduce your risk for problems down the line.",
+      "latency_ms": 1206.4,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.6689
+        },
+        {
+          "source": "Statin therapy is not warranted for a person with high LDL-cholesterol on a low-carbohydrate diet. \u2014 PMID 35938780 | Diamond DM, Bikman BT, Mason P. Current opinion in endocrinology, diabetes, and obesity. 2022",
+          "score": 0.562
+        },
+        {
+          "source": "Statins do not decrease small, dense low-density lipoprotein. \u2014 PMID 20844614 | Choi CU, Seo HS, Lee EM et al.. Texas Heart Institute journal. 2010",
+          "score": 0.5524
+        }
+      ],
+      "scores": {
+        "keyword_recall": 1.0,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.355,
+        "semantic_similarity": 0.791
+      }
+    },
+    {
+      "question": "my dad had a heart attack last year, how do i know if im at risk",
+      "category": "cardiovascular",
+      "ground_truth": "Heart attack risk factors include high blood pressure, high cholesterol, smoking, diabetes, obesity, family history, and physical inactivity. A doctor can assess personal risk.",
+      "answer": "I'm so sorry to hear that your dad had a heart attack. It's completely understandable that you're concerned about your own risk. \n\nWhen it comes to heart health, there are several factors that can increase your risk. If your dad had a heart attack, it's possible that you may be at a higher risk as well. This is because heart disease often runs in families.\n\nSome of the factors that can increase your risk include your age, sex, and family history. If you're a man under 60 or a woman over 55, your risk is higher. Additionally, if you have a family history of heart disease, especially if it started at a young age, you may be more likely to develop it as well.\n\nIt's also worth noting that some risk factors can't be changed, such as your sex and family history. However, there are many things that you can do to reduce your risk, such as eating a healthy diet, exercising regularly, and managing stress.\n\nThe best way to determine your individual risk is to talk to a doctor. They can assess your overall health and provide personalized advice on how to reduce your risk. If you're concerned about your heart health, I would definitely recommend scheduling an appointment with your doctor. They can help you understand your risk and develop a plan to keep your heart healthy.",
+      "latency_ms": 1235.8,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4261
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4234
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4099
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.429,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.4,
+        "semantic_similarity": 0.668
+      }
+    },
+    {
+      "question": "whats the difference between osteoarthritis and rheumatoid arthritis",
+      "category": "musculoskeletal",
+      "ground_truth": "Osteoarthritis is mechanical wear-and-tear joint damage. Rheumatoid arthritis is autoimmune where the immune system attacks the joint lining causing systemic inflammation.",
+      "answer": "So, you're wondering about the difference between osteoarthritis and rheumatoid arthritis. Both are types of arthritis, but they're caused by different things and affect the body in different ways.\n\nOsteoarthritis is often referred to as \"wear and tear\" arthritis. It happens when the cartilage that cushions the joints breaks down, causing pain and stiffness. This can be due to aging, injury, or repetitive strain on the joint. For example, if you've had a knee injury or have been doing a lot of heavy lifting, you might develop osteoarthritis in that joint.\n\nRheumatoid arthritis, on the other hand, is an autoimmune disease. This means that your body's immune system mistakenly attacks the lining of the joints, causing inflammation and damage. It's often symmetrical, meaning that if one hand or knee is affected, the other one is likely to be too. Rheumatoid arthritis can also affect other parts of the body, like the skin, eyes, and lungs.\n\nSo, the main differences are:\n\n* Osteoarthritis is usually caused by wear and tear, while rheumatoid arthritis is an autoimmune disease.\n* Osteoarthritis is often asymmetrical, while rheumatoid arthritis is typically symmetrical.\n* Osteoarthritis tends to affect older adults, while rheumatoid arthritis can affect people of any age.\n\nIt's worth noting that both conditions can cause similar symptoms, like pain, stiffness, and swelling. But if you're experiencing these symptoms, it's always a good idea to talk to a doctor to figure out what's going on and get the right treatment.",
+      "latency_ms": 1409.3,
+      "sources": [
+        {
+          "source": "RA Treatment Guidelines \u2014 PMID 32659001 | Ann Rheum Dis. 2020",
+          "score": 0.5017
+        },
+        {
+          "source": "Engagement between patients with obesity and osteoarthritis and primary care physicians: a cross-sectional survey. \u2014 PMID 34538196 | Horn DB, Damsgaard C, Earles K et al.. Postgraduate medicine. 2021",
+          "score": 0.4724
+        },
+        {
+          "source": "Autoimmunity and cancer. \u2014 PMID 34229048 | Masetti R, Tiri A, Tignanelli A et al.. Autoimmunity reviews. 2021",
+          "score": 0.4457
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.431,
+        "semantic_similarity": 0.824
+      }
+    },
+    {
+      "question": "besides looking overweight, what are the actual health problems obesity causes",
+      "category": "metabolic",
+      "ground_truth": "Obesity increases risk of type 2 diabetes, cardiovascular disease, hypertension, sleep apnea, certain cancers, osteoarthritis, and fatty liver disease.",
+      "answer": "Obesity is a serious health concern that affects many people worldwide. Besides making you look overweight, obesity can lead to a range of serious health problems. These can include type 2 diabetes (T2DM), which affects the way your body processes sugar. It can also increase your risk of heart disease, high blood pressure, and stroke. Additionally, obesity is linked to a higher risk of sleep apnea, a condition where you stop breathing for short periods while you're asleep. \n\nIt's also associated with non-alcoholic fatty liver disease, which is a condition where fat builds up in your liver. And, unfortunately, obesity increases your risk of developing certain types of cancer. So, it's not just about looking overweight; obesity is a serious health issue that can have significant consequences for your overall well-being.",
+      "latency_ms": 29678.5,
+      "sources": [
+        {
+          "source": "Obesity management: at the forefront against disease stigma and therapeutic inertia. \u2014 PMID 34052990 | Busetto L, Sbraccia P, Vettor R. Eating and weight disorders : EWD. 2022",
+          "score": 0.5397
+        },
+        {
+          "source": "Obesity Management \u2014 PMID 32997947 | Lancet. 2021",
+          "score": 0.496
+        },
+        {
+          "source": "Healthful plant-based dietary patterns, genetic risk of obesity, and cardiovascular risk in the UK biobank study. \u2014 PMID 34237696 | Heianza Y, Zhou T, Sun D et al.. Clinical nutrition (Edinburgh, Scotland). 2021",
+          "score": 0.48
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.4,
+        "semantic_similarity": 0.823
+      }
+    },
+    {
+      "question": "what is BMI and is it actually a good measure of health",
+      "category": "metabolic",
+      "ground_truth": "BMI is body mass index calculated from height and weight. It is a screening tool but has limitations as it does not account for muscle mass or fat distribution.",
+      "answer": "BMI, or Body Mass Index, is a way to measure your weight in relation to your height. It's calculated by dividing your weight in kilograms by your height in meters squared. The result gives you a number that's used to categorize your weight status.\n\nNow, about whether BMI is a good measure of health - it's not perfect, but it's a useful tool. The thing is, BMI doesn't take into account where your weight is distributed on your body. For example, someone who is very muscular might have a high BMI, but that doesn't necessarily mean they're unhealthy. On the other hand, someone who has a lot of fat around their waist might have a normal BMI, but still be at risk for health problems.\n\nThink of BMI as a rough guide, rather than a definitive measure of health. It can be a good starting point for discussions about weight and health, but it's not the whole story. Other factors like your waist circumference, blood pressure, and cholesterol levels can give a more complete picture of your health.\n\nIt's also worth noting that BMI is just one of many factors that can affect your health. Genetics, lifestyle, and other health conditions can all play a role in determining your overall health, so it's always a good idea to talk to a doctor or healthcare provider if you have concerns about your weight or health.",
+      "latency_ms": 1285.0,
+      "sources": [
+        {
+          "source": "Obesity Management \u2014 PMID 32997947 | Lancet. 2021",
+          "score": 0.4466
+        },
+        {
+          "source": "Validation of a self-administered version of the Mediterranean diet scale (MDS) for cardiac rehabilitation patients in Canada. \u2014 PMID 29962239 | Ghisi GLM, Mahajan A, da Silva Chaves GS et al.. International journal of food sciences and nutrition. 2019",
+          "score": 0.4221
+        },
+        {
+          "source": "Obesity Management in Kidney Transplant Candidates: Current Paradigms and Gaps in Knowledge. \u2014 PMID 35367021 | Lee JH, McDonald EO, Harhay MN. Advances in chronic kidney disease. 2021",
+          "score": 0.4123
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.571,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.135,
+        "semantic_similarity": 0.873
+      }
+    },
+    {
+      "question": "how does my immune system actually fight off an infection",
+      "category": "immunology",
+      "ground_truth": "The immune system uses neutrophils and macrophages as first responders and B cells producing antibodies for targeted defence. Phagocytes engulf and destroy pathogens.",
+      "answer": "So, when your immune system detects an infection, it's like a highly trained team responding to a threat. The first line of defense is your skin and mucous membranes, which act as a barrier to keep germs out. But if an infection does get past those barriers, your immune system kicks in.\n\nHere's how it works: your immune system sends out special cells called white blood cells to find and destroy the invading germs. These white blood cells are like a SWAT team, and they're equipped with special tools to recognize and attack the enemy. They can also call in reinforcements, like antibodies, which are like a special kind of soldier that's designed to target specific types of germs.\n\nThink of it like a two-part system: your immune system has a way of recognizing what's \"self\" (your own cells and tissues) and what's \"not self\" (the invading germs). When it identifies something as \"not self,\" it sends out the white blood cells and antibodies to attack and eliminate the threat. It's a very specific and targeted response, which helps to prevent damage to your own cells and tissues.\n\nIn a healthy immune system, this process works like a well-oiled machine. But sometimes, things can go awry, and that's when autoimmune disorders can occur. But that's a topic for another time!",
+      "latency_ms": 1155.6,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5741
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5263
+        },
+        {
+          "source": "Belimumab and antipneumococcal vaccination in patients with systemic lupus erythematosus. \u2014 PMID 29336179 | Azoicai T, Antoniu S, Caruntu ID et al.. Expert review of clinical immunology. 2018",
+          "score": 0.4666
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.429,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.49,
+        "semantic_similarity": 0.656
+      }
+    },
+    {
+      "question": "why do i get a fever when im sick",
+      "category": "immunology",
+      "ground_truth": "Fever is a controlled immune response where the hypothalamus raises body temperature to inhibit bacterial and viral growth and speed up immune cell activity.",
+      "answer": "You know, when our bodies detect something foreign, like a virus or bacteria, it sends out an alarm signal to our immune system. This alarm signal is what causes our body temperature to rise, which is why we feel feverish. It's like our body is trying to create a hostile environment for the invader, making it harder for it to multiply and cause harm.\n\nThink of it like a fire in a fireplace. When you light a fire, it gets hot because of the chemical reaction between the wood and oxygen. Similarly, when our body detects an infection, it's like lighting a fire that gets hotter and hotter, causing our temperature to rise. This fever is a natural response to help fight off the infection, but it can also make us feel uncomfortable and tired.\n\nIt's worth noting that not all fevers are caused by infections. Sometimes, fevers can be caused by other factors, like a reaction to a medication or an underlying medical condition. But in general, a fever is a sign that our body is working hard to fight off something that's not supposed to be there.",
+      "latency_ms": 1109.4,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4781
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4214
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3984
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.286,
+        "ground_truth_overlap": 0.429,
+        "source_supported": 0.431,
+        "semantic_similarity": 0.702
+      }
+    },
+    {
+      "question": "whats an autoimmune disease and why does the body attack itself",
+      "category": "immunology",
+      "ground_truth": "Autoimmune diseases occur when the immune system mistakenly attacks healthy cells. The cause involves a mix of genetic predisposition and environmental triggers.",
+      "answer": "An autoimmune disease is a condition where your body's immune system mistakenly attacks and damages its own cells, tissues, or organs. It's like your body's defense system gets mixed up and starts fighting the wrong enemy.\n\nImagine your immune system is like a security guard at a building. Its job is to protect the building and its occupants from any intruders. But in an autoimmune disease, the security guard starts to think that the people living in the building are the intruders, and it starts to attack them.\n\nThis can happen for a variety of reasons, but it's not entirely clear why. Sometimes it might be due to a genetic predisposition, or it could be triggered by an environmental factor or a viral infection. Whatever the reason, the result is that your body starts to attack its own healthy cells, leading to a range of symptoms and health problems.\n\nIt's a bit like a computer virus that infects a computer and starts to cause problems. In an autoimmune disease, it's like the immune system has become infected with a \"virus\" that makes it attack the wrong targets.\n\nThere are many different types of autoimmune diseases, and each one affects different parts of the body. Some common examples include conditions like rheumatoid arthritis, lupus, and multiple sclerosis. In each of these cases, the immune system is mistakenly attacking healthy cells, leading to inflammation, damage, and a range of symptoms.\n\nThe good news is that there are treatments available to help manage autoimmune diseases and reduce their symptoms. These can include medications, lifestyle changes, and other therapies. But it's a complex and ongoing process, and it's often a team effort between healthcare providers, patients, and their families to find the right approach and manage the disease effectively.",
+      "latency_ms": 1243.6,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.7395
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.6286
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5834
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.46,
+        "semantic_similarity": 0.853
+      }
+    },
+    {
+      "question": "what does the liver actually do",
+      "category": "organ_function",
+      "ground_truth": "The liver filters blood, produces bile for digestion, metabolises drugs and toxins, synthesises proteins, and stores glycogen for energy.",
+      "answer": "The liver is an incredible organ that plays a vital role in our overall health. It's often referred to as the body's filter, but its functions go far beyond that. \n\nImagine the liver as a multitasking superhero. It's responsible for detoxifying our blood, removing toxins and waste products that can harm us. It also helps to metabolize the nutrients we consume, breaking down proteins, carbohydrates, and fats into energy that our bodies can use.\n\nThe liver is also a key player in producing essential proteins that help our blood clot, and it stores glycogen, a complex carbohydrate that's converted into glucose when our bodies need energy. \n\nBut that's not all - the liver also helps to regulate our metabolism, storing and releasing energy as needed. It even produces bile, a digestive fluid that helps us break down fats and absorb essential vitamins and minerals.\n\nIn short, the liver is a remarkable organ that works tirelessly behind the scenes to keep us healthy and functioning properly.",
+      "latency_ms": 1291.3,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4103
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3975
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3963
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.169,
+        "semantic_similarity": 0.741
+      }
+    },
+    {
+      "question": "what do the kidneys do and how do i know if they arent working properly",
+      "category": "organ_function",
+      "ground_truth": "Kidneys filter waste from blood, regulate fluid balance, and control blood pressure. Signs of dysfunction include swelling, fatigue, changes in urination, and back pain.",
+      "answer": "Let's talk about the kidneys. Your kidneys are two small, bean-shaped organs located in your lower back, just below your ribcage. They're like two tiny filters that work hard to keep your body healthy.\n\nOne of the main jobs of your kidneys is to filter waste and excess fluids from your blood. They help remove toxins, like urea, that can build up in your body and cause problems. They also help regulate the balance of fluids in your body, which is important for maintaining healthy blood pressure.\n\nYour kidneys also help produce hormones that are essential for your body's function. For example, they produce erythropoietin, which helps stimulate the production of red blood cells. This is important for carrying oxygen throughout your body.\n\nSo, how do you know if your kidneys aren't working properly? Well, there are several signs and symptoms that can indicate a problem. Some common signs include:\n\n* Swelling in your feet, ankles, or hands (edema)\n* Fatigue or weakness\n* Nausea or vomiting\n* Loss of appetite\n* Pale or yellowish skin\n* Bad breath or a metallic taste in your mouth\n* Bone or joint pain\n* Frequent urination or foamy urine\n\nIf you're experiencing any of these symptoms, it's always a good idea to talk to your doctor to rule out any underlying kidney problems. They can perform tests to check your kidney function and determine the cause of any symptoms you're experiencing.",
+      "latency_ms": 1165.6,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.58
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5429
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4939
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.857,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.596,
+        "semantic_similarity": 0.589
+      }
+    },
+    {
+      "question": "what are the general warning signs that could indicate cancer",
+      "category": "oncology",
+      "ground_truth": "General cancer warning signs include unexplained weight loss, persistent fatigue, unusual lumps, changes in bowel habits, persistent cough, and unexplained bleeding.",
+      "answer": "When it comes to breast cancer, there are some general warning signs to look out for. Keep in mind that not all women with these symptoms will have cancer, and some women with cancer may not have any symptoms at all. That's why it's essential to get regular check-ups and follow the recommended screening guidelines.\n\nSome common warning signs of breast cancer include:\n\n* A new lump or thickening in the breast or underarm area\n* A change in the size or shape of the breast\n* Dimpling or puckering of the skin\n* Redness or scaliness of the skin\n* Nipple discharge or tenderness\n* A change in the way the nipple looks or feels\n\nIt's also a good idea to be aware of any changes in your breast tissue, such as pain, swelling, or discharge. If you notice any of these changes or have concerns, it's always best to talk to your doctor.\n\nRemember, breast cancer is more common in women with a family history of the disease, but it can affect anyone. If you have a strong family history or are concerned about your risk, be sure to discuss it with your doctor.\n\nIn general, if you notice any unusual changes in your body or have concerns about your health, it's always best to talk to your doctor. They can help you determine the cause of any symptoms and recommend the best course of action.",
+      "latency_ms": 1277.8,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4834
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4732
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4725
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.143,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.629,
+        "semantic_similarity": 0.697
+      }
+    }
+  ]
+}

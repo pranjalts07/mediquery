@@ -1,0 +1,648 @@
+{
+  "timestamp": "2026-03-29T17:32:39.997121",
+  "target_url": "https://mediquery-app.azurewebsites.net",
+  "mode": "detailed",
+  "total_queries": 25,
+  "successful_queries": 24,
+  "success_rate": 0.96,
+  "latency_stats": {
+    "min_ms": 966.0,
+    "median_ms": 1609.3,
+    "mean_ms": 2454.4,
+    "p95_ms": 4609.8
+  },
+  "quality_scores": {
+    "keyword_recall": 0.59,
+    "ground_truth_overlap": 0.922,
+    "source_supported": 0.414,
+    "semantic_similarity": 0.739
+  },
+  "overall_score": 0.666,
+  "grade": "B",
+  "per_query": [
+    {
+      "question": "my doctor said i have high blood pressure, what does that actually mean and why is it bad?",
+      "category": "cardiovascular",
+      "ground_truth": "Hypertension is persistently elevated blood pressure above 130/80 mmHg. Risk factors include obesity, high sodium diet, physical inactivity, smoking, alcohol, family history, and stress. It increases risk of heart attack, stroke, and kidney disease.",
+      "answer": "I'm so glad you're asking questions about your diagnosis. Having high blood pressure, also known as hypertension, means that the force of blood pushing against the walls of your blood vessels is higher than it should be. Think of it like the water pressure in a hose - if the pressure gets too high, it can cause damage to the hose over time.\n\nIn your case, your doctor has detected that your blood pressure is higher than it should be, which means that your heart is working a bit harder to pump blood throughout your body. This can be a problem because it can put extra strain on your heart and blood vessels, which can lead to serious health issues down the line.\n\nThe reason high blood pressure is bad is that it can cause damage to your blood vessels and heart over time. Imagine your blood vessels as a delicate network of roads that blood travels through - if the roads get too congested or damaged, it can be harder for blood to get where it needs to go, and that can lead to problems like heart attacks, strokes, and even kidney disease.\n\nBut here's the good news: high blood pressure is often treatable, and with the right lifestyle changes and medication, you can keep your blood pressure under control and reduce your risk of these complications. Your doctor will work with you to develop a plan to manage your blood pressure and keep you healthy.",
+      "latency_ms": 2744.7,
+      "sources": [
+        {
+          "source": "Global Hypertension Practice Guidelines \u2014 PMID 33268196 | Hypertension. 2020",
+          "score": 0.4818
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.479
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4687
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.833,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.588,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "whats the difference between the two numbers they always measure in blood pressure",
+      "category": "cardiovascular",
+      "ground_truth": "Systolic blood pressure is the pressure when the heart beats and pumps blood. Diastolic is the pressure when the heart rests between beats. Normal is below 120/80 mmHg.",
+      "answer": "So, when we talk about blood pressure, we're usually referring to two numbers: the systolic pressure and the diastolic pressure. The systolic pressure is the top number, and it's the pressure in your arteries when your heart beats. It's like the \"pumping\" pressure, if you will.\n\nThe diastolic pressure, on the other hand, is the bottom number, and it's the pressure in your arteries between beats, when your heart is resting. It's like the \"resting\" pressure.\n\nThink of it like a water hose. When you turn on the water, the pressure is high, just like the systolic pressure. But when you turn off the water, the pressure drops, just like the diastolic pressure. So, the systolic pressure is like the water pressure when it's flowing, and the diastolic pressure is like the pressure when it's not flowing.\n\nIt's a good idea to aim for a healthy blood pressure, which is usually considered to be below 120/80 mmHg. But if you're concerned about your blood pressure or have any questions, it's always best to talk to your doctor.",
+      "latency_ms": 2891.9,
+      "sources": [
+        {
+          "source": "Global Hypertension Practice Guidelines \u2014 PMID 33268196 | Hypertension. 2020",
+          "score": 0.4418
+        },
+        {
+          "source": "Pharmacological Treatment of Hypertension \u2014 PMID 31475488 | Lancet. 2019",
+          "score": 0.3898
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3723
+        }
+      ],
+      "scores": {
+        "keyword_recall": 1.0,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.609,
+        "semantic_similarity": 0.722
+      }
+    },
+    {
+      "question": "i keep hearing about bad cholesterol, can you explain what ldl actually does",
+      "category": "cardiovascular",
+      "ground_truth": "LDL cholesterol carries fat from the liver to cells. High LDL causes plaque buildup in artery walls leading to atherosclerosis, increasing risk of heart attack and stroke.",
+      "answer": "LDL, or \"bad\" cholesterol, is a type of fat found in your blood. It's called \"bad\" because high levels of it can increase your risk of heart disease and stroke. LDL cholesterol is like a delivery truck that carries cholesterol to different parts of your body.\n\nImagine your body's cells as houses that need building materials to repair and maintain themselves. Cholesterol is one of those building materials, and LDL cholesterol is the truck that brings it to the right address. However, if there's too much LDL cholesterol in the truck, it can start to unload its cargo in the wrong places, like the walls of your arteries.\n\nWhen this happens, it can cause a buildup of plaque, a sticky substance made of fat, cholesterol, and other materials. Over time, this buildup can narrow your arteries and make it harder for blood to flow through them. This can lead to all sorts of problems, including heart disease and stroke.\n\nSo, to sum it up, LDL cholesterol is like a delivery truck that brings cholesterol to your body's cells. While it's essential for certain functions, too much of it can cause problems, and it's called \"bad\" cholesterol because of its potential risks.",
+      "latency_ms": 1484.0,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.6689
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5012
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4163
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.435,
+        "semantic_similarity": 0.792
+      }
+    },
+    {
+      "question": "my dad had a heart attack last year, how do i know if im at risk",
+      "category": "cardiovascular",
+      "ground_truth": "Heart attack risk factors include high blood pressure, high cholesterol, smoking, diabetes, obesity, family history, and physical inactivity. A doctor can assess personal risk.",
+      "answer": "I'm so sorry to hear that your dad had a heart attack last year. That can be really scary for the whole family. When it comes to your own risk, it's great that you're thinking about it.\n\nFirst, let's talk about what we know about heart disease. If someone in your family has had a heart attack, it's possible that you might be at higher risk too. This is because heart disease can run in families, and if your dad had a heart attack, you might be more likely to have some of the same risk factors.\n\nBut don't worry, there are many things that can affect your risk, and not all of them are related to family history. Some things that can increase your risk include your age, sex, and lifestyle choices, like whether you smoke or exercise regularly.\n\nOne thing that's really important is to talk to your doctor about your individual risk factors. They can help you figure out what's going on and make a plan to reduce your risk.\n\nIn the meantime, there are some things you can do to lower your risk. These include eating a healthy diet, exercising regularly, not smoking, and managing stress. It's also a good idea to get regular check-ups with your doctor, so they can keep an eye on your heart health.\n\nIt's also worth noting that even if you do have some risk factors, there are many things that can be done to prevent a heart attack. So, don't worry too much about it, and focus on taking care of yourself.\n\nIf you're concerned about your risk or have any questions, I would definitely recommend talking to your doctor. They can give you personalized advice and help you make a plan to stay healthy.",
+      "latency_ms": 1221.3,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4261
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4234
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4099
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.571,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.364,
+        "semantic_similarity": 0.619
+      }
+    },
+    {
+      "question": "im always thirsty and peeing a lot, could that be diabetes",
+      "category": "diabetes",
+      "ground_truth": "Frequent urination and excessive thirst are classic symptoms of diabetes. Other symptoms include fatigue, blurred vision, slow-healing sores, and unexplained weight loss.",
+      "answer": "Being thirsty and peeing a lot can be a bit unsettling, and it's natural to wonder if it could be related to diabetes. While it's not the only possible cause, it's definitely something we should explore.\n\nThose symptoms can be associated with a few different things, but diabetes is definitely one possibility. When you have diabetes, your body either doesn't produce enough insulin or can't use it properly, which can cause your blood sugar levels to rise. This can make you feel thirsty and need to pee more often, as your body tries to flush out the excess sugar.\n\nHowever, it's essential to remember that there are many other potential causes for these symptoms, such as certain medications, hormonal imbalances, or even kidney problems. So, while it's possible that diabetes could be the cause, it's not the only explanation.\n\nIf you're concerned about your symptoms, I would strongly recommend speaking with a healthcare professional. They can do some tests to determine the underlying cause and provide a proper diagnosis and treatment plan. They'll likely want to discuss your medical history, perform some physical exams, and possibly run some blood or urine tests to help figure out what's going on.\n\nIn the meantime, it's always a good idea to stay hydrated by drinking plenty of water, but try to limit your fluid intake to avoid overdoing it. If your symptoms persist or worsen, don't hesitate to reach out to a healthcare professional for further guidance and support.",
+      "latency_ms": 1328.7,
+      "sources": [
+        {
+          "source": "Global Epidemiology of Type 2 Diabetes \u2014 PMID 34161073 | Lancet. 2021",
+          "score": 0.4424
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4336
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4269
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.333,
+        "ground_truth_overlap": 0.562,
+        "source_supported": 0.336,
+        "semantic_similarity": 0.824
+      }
+    },
+    {
+      "question": "how does insulin actually work in the body",
+      "category": "diabetes",
+      "ground_truth": "Insulin is a hormone produced by the pancreas that allows cells to absorb glucose from the blood for energy. Without insulin, glucose builds up in the bloodstream causing hyperglycemia.",
+      "answer": "So, you want to know how insulin works in the body. That's a great question. Insulin is a hormone that plays a crucial role in helping our bodies use glucose, a type of sugar, for energy.\n\nThink of it like a key that unlocks a door. The door is the cell membrane, and the key is insulin. When insulin is present, it helps glucose molecules pass through the cell membrane and into the cells, where they can be used for energy.\n\nImagine your cells are like a house, and glucose is like a package that needs to be delivered. The cell membrane is like the front door, and insulin is like the key that unlocks the door, allowing the package to be delivered inside. Without insulin, the package can't get in, and the cells can't use the glucose for energy.\n\nInsulin also helps regulate how much glucose is in the bloodstream. When you eat, your body breaks down the food into glucose, which is then released into the bloodstream. Insulin helps to lower the amount of glucose in the bloodstream by facilitating its entry into the cells, where it can be used for energy. This helps to keep your blood sugar levels within a healthy range.\n\nIn people with diabetes, the body either doesn't produce enough insulin or can't use insulin effectively. This can cause blood sugar levels to rise, leading to a range of problems, including damage to the eyes, kidneys, nerves, heart, and blood vessels.\n\nI hope that helps you understand how insulin works in the body. Do you have any other questions about insulin or diabetes?",
+      "latency_ms": 1354.7,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.547
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4909
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4828
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.518,
+        "semantic_similarity": 0.774
+      }
+    },
+    {
+      "question": "i get really short of breath when i exercise, could it be asthma",
+      "category": "respiratory",
+      "ground_truth": "Exercise-induced asthma causes airway narrowing during physical activity. Symptoms include shortness of breath, wheezing, and chest tightness. Treatment includes bronchodilator inhalers.",
+      "answer": "You're wondering if it could be asthma that's causing you to get short of breath when you exercise. That's a great question. Exercise-induced asthma, also known as exercise-induced bronchospasm, is a common condition where the airways in your lungs become narrow and inflamed, making it harder to breathe during physical activity.\n\nThere are a few things that might be going on here. It's possible that your airways are reacting to the physical stress of exercise, which can trigger an asthma attack. This can happen even if you don't have a history of asthma. On the other hand, it's also possible that you might have a different condition that's causing your shortness of breath during exercise.\n\nTo figure out what's going on, it's a good idea to talk to a doctor. They can do some tests to see if your airways are narrowing during exercise, and to rule out other conditions that might be causing your symptoms. In the meantime, you might want to try a few things to see if they help. For example, you could try taking a medication called a bronchodilator before exercise to see if it helps your airways stay open. You could also try exercising in a cool, dry environment, or wearing a mask to filter out any irritants in the air.\n\nIt's also worth noting that even if you do have asthma, it's not necessarily a bad thing. With the right treatment and management, you can learn to control your symptoms and exercise safely. So don't worry too much \u2013 just talk to a doctor and get to the bottom of what's going on.",
+      "latency_ms": 2907.3,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5818
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4726
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4584
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.5,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.536,
+        "semantic_similarity": 0.735
+      }
+    },
+    {
+      "question": "how does smoking actually damage your lungs",
+      "category": "respiratory",
+      "ground_truth": "Smoking causes chronic inflammation, destroys air sacs reducing lung capacity, leads to COPD and emphysema, paralyses cilia so mucus builds up, and significantly raises lung cancer risk.",
+      "answer": "Smoking is a major culprit when it comes to lung damage. When you inhale cigarette smoke, the tiny particles and chemicals in the smoke can irritate the delicate tissues inside your lungs. This irritation can cause inflammation and scarring, which can lead to a range of problems.\n\nOne of the main issues with smoking is that it can damage the tiny air sacs in your lungs called alveoli. These air sacs are responsible for exchanging oxygen and carbon dioxide, and when they're damaged, it can make it harder for your body to get the oxygen it needs.\n\nSmoking can also cause the airways in your lungs to become narrower and more inflamed, which can make it harder to breathe. This can lead to symptoms like wheezing, coughing, and shortness of breath.\n\nOver time, the repeated damage to your lungs from smoking can lead to chronic obstructive pulmonary disease (COPD), a condition that makes it hard to breathe and can even lead to respiratory failure. And, of course, smoking is linked to many other serious health problems, including lung cancer.\n\nIt's worth noting that secondhand smoke can also cause lung damage, even if you're not a smoker yourself. This is because the chemicals in cigarette smoke can still irritate your lungs and airways, even if you're not inhaling them directly.\n\nOverall, quitting smoking is one of the best things you can do for your lung health. If you're a smoker, I encourage you to talk to your doctor about resources and support to help you kick the habit.",
+      "latency_ms": 1570.8,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4959
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4739
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4552
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.75,
+        "ground_truth_overlap": 0.562,
+        "source_supported": 0.518,
+        "semantic_similarity": 0.738
+      }
+    },
+    {
+      "question": "whats the difference between a cold and the flu",
+      "category": "infectious",
+      "ground_truth": "Colds have gradual onset and mainly affect the nose and throat. Flu has sudden onset with fever, body aches, and fatigue and can cause serious complications.",
+      "answer": "The age-old question: what's the difference between a cold and the flu? Both can make you feel miserable, but they're caused by different viruses and have distinct symptoms.\n\nA cold is usually caused by a virus that affects the upper respiratory tract, like a common cold. It's often characterized by a runny nose, sneezing, and a mild cough. You might feel a bit stuffy or congested, but it's generally not too severe. Colds are contagious, but they're usually not as serious as the flu.\n\nThe flu, on the other hand, is caused by the influenza virus. It's a more serious illness that can affect not just your upper respiratory tract, but also your lungs and other parts of your body. The flu often comes on suddenly, and you might feel feverish, have a headache, and experience body aches. Your cough can be more severe, and you might have a sore throat. The flu can also lead to complications like pneumonia, bronchitis, or sinus and ear infections.\n\nOne key difference between a cold and the flu is how quickly they develop. Colds tend to come on gradually, while the flu can hit you hard and fast. Another difference is the severity of the symptoms. While a cold might leave you feeling a bit under the weather, the flu can make you feel really sick and debilitated.\n\nIt's worth noting that some people might get bronchitis or pneumonia after having a cold or the flu. This is because the viruses that cause these illnesses can sometimes lead to secondary infections. But in general, a cold is a milder illness, while the flu is a more serious one.\n\nIf you're feeling unwell and can't shake off a cough or fever, it's always a good idea to talk to a healthcare professional to get a proper diagnosis and treatment plan. They can help you figure out what's going on and provide guidance on how to feel better.",
+      "latency_ms": 1240.3,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4876
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4205
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.857,
+        "ground_truth_overlap": 0.846,
+        "source_supported": 0.395,
+        "semantic_similarity": 0.732
+      }
+    },
+    {
+      "question": "my joints are always swollen and painful in the morning, what could cause that",
+      "category": "musculoskeletal",
+      "ground_truth": "Morning joint stiffness and swelling is a hallmark of rheumatoid arthritis, an autoimmune disease. It can also indicate gout or other inflammatory conditions.",
+      "answer": "I'm so sorry to hear that you're experiencing joint pain and swelling in the morning. That can be really uncomfortable and disrupt your daily life. There are several possible causes for this, and I'd like to run through a few possibilities with you.\n\nFirst, it's possible that you might be experiencing osteoarthritis, which is a common condition that affects the joints as we age. Osteoarthritis can cause stiffness and pain in the joints, especially in the morning. Another possibility is that you might be experiencing inflammation in your joints, which can be caused by a variety of factors, including injury, overuse, or even certain medical conditions.\n\nIt's also possible that your joint pain and swelling could be related to your sleep habits or lifestyle. For example, if you're not getting enough restful sleep or if you're putting a lot of strain on your joints through activities like heavy lifting or repetitive motion, you might be more prone to morning joint pain.\n\nThere are also some medical conditions that can cause joint pain and swelling, such as rheumatoid arthritis or lupus. These conditions can cause inflammation and pain in the joints, and they often have other symptoms like fatigue, fever, or skin rashes.\n\nThe best way to determine the cause of your joint pain and swelling is to talk to a healthcare professional. They can do a physical exam, take a medical history, and run some tests to help figure out what's going on. In the meantime, there are some things you can try to help manage your symptoms. For example, you might want to try taking a warm bath or shower in the morning to help loosen up your joints, or you could try using a foam roller or other self-care tools to help reduce stiffness and pain.\n\nI hope this helps, and I encourage you to talk to a healthcare professional if your symptoms persist or worsen over time.",
+      "latency_ms": 3238.9,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4336
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4301
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3866
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.5,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.471,
+        "semantic_similarity": 0.78
+      }
+    },
+    {
+      "question": "whats the difference between osteoarthritis and rheumatoid arthritis",
+      "category": "musculoskeletal",
+      "ground_truth": "Osteoarthritis is mechanical wear-and-tear joint damage. Rheumatoid arthritis is autoimmune where the immune system attacks the joint lining causing systemic inflammation.",
+      "answer": "You're looking to understand the difference between osteoarthritis and rheumatoid arthritis. Both conditions affect the joints, but they're quite distinct in terms of their causes and symptoms.\n\nOsteoarthritis, often referred to as \"wear and tear\" arthritis, is a degenerative condition that occurs when the cartilage in your joints breaks down over time. This can be due to various factors such as aging, injury, or repetitive strain. Imagine the cartilage in your joints as a cushion that protects the bones from rubbing against each other. As the cartilage wears down, the bones can start to rub against each other, causing pain, stiffness, and swelling.\n\nRheumatoid arthritis, on the other hand, is an autoimmune disease that causes the immune system to attack the lining of the joints, known as the synovium. This leads to inflammation, pain, and stiffness in the joints. It's a bit like the immune system is mistakenly attacking the joints, causing damage and discomfort.\n\nOne key difference between the two conditions is that osteoarthritis tends to affect the joints in a more predictable way, often in the hands, knees, hips, or spine. Rheumatoid arthritis, however, can affect any joint in the body and often occurs in a more symmetrical pattern, meaning that if one hand is affected, the other hand might be too.\n\nIt's worth noting that while both conditions can cause pain and stiffness, rheumatoid arthritis is often associated with systemic symptoms, such as fatigue, fever, and weight loss, which can be a sign that the disease is affecting the body more broadly.\n\nIf you're experiencing symptoms that concern you, it's always a good idea to speak with a healthcare professional for a proper evaluation and diagnosis. They can help determine the underlying cause of your symptoms and develop a treatment plan to manage your condition.",
+      "latency_ms": 1248.8,
+      "sources": [
+        {
+          "source": "RA Treatment Guidelines \u2014 PMID 32659001 | Ann Rheum Dis. 2020",
+          "score": 0.5017
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3929
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3782
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.464,
+        "semantic_similarity": 0.837
+      }
+    },
+    {
+      "question": "besides looking overweight, what are the actual health problems obesity causes",
+      "category": "metabolic",
+      "ground_truth": "Obesity increases risk of type 2 diabetes, cardiovascular disease, hypertension, sleep apnea, certain cancers, osteoarthritis, and fatty liver disease.",
+      "answer": "Obesity is a complex condition that affects many aspects of our health. Besides the visible signs of being overweight, obesity can lead to several serious health problems. \n\nOne of the main concerns is the increased risk of developing type 2 diabetes. This is because excess weight can lead to insulin resistance, making it harder for our bodies to regulate blood sugar levels. \n\nObesity also raises our risk of heart disease, including conditions like high blood pressure and atherosclerosis. This is because excess weight puts extra strain on our hearts, which can lead to damage over time. \n\nAnother significant concern is the link between obesity and certain types of cancer. Research has shown that being overweight or obese can increase our risk of developing several types of cancer, including breast, colon, and kidney cancer. \n\nAdditionally, obesity can lead to non-alcoholic fatty liver disease, which is a condition where excess fat builds up in the liver. This can cause inflammation and scarring, which can lead to serious complications if left untreated. \n\nFinally, obesity can also increase our risk of sleep apnea, a condition where we stop breathing for short periods during sleep. This can lead to poor sleep quality, fatigue, and other related health problems. \n\nIt's essential to remember that obesity is a treatable condition, and making lifestyle changes, such as eating a healthy diet and engaging in regular physical activity, can help us manage our weight and reduce our risk of developing these health problems.",
+      "latency_ms": 1191.9,
+      "sources": [
+        {
+          "source": "Obesity Management \u2014 PMID 32997947 | Lancet. 2021",
+          "score": 0.496
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4677
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4633
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.458,
+        "semantic_similarity": 0.826
+      }
+    },
+    {
+      "question": "what is BMI and is it actually a good measure of health",
+      "category": "metabolic",
+      "ground_truth": "BMI is body mass index calculated from height and weight. It is a screening tool but has limitations as it does not account for muscle mass or fat distribution.",
+      "answer": "BMI, or Body Mass Index, is a way to measure whether your weight is in a healthy range for your height. It's calculated by dividing your weight in kilograms by your height in meters squared. For example, if you weigh 70 kilograms and are 1.7 meters tall, your BMI would be 70 divided by 2.89 (1.7 squared), which is approximately 24.\n\nNow, is BMI a good measure of health? Well, it's a good starting point, but it's not perfect. It doesn't take into account muscle mass or body composition, so someone who is very muscular might have a high BMI without being overweight. On the other hand, someone with a low muscle mass might have a normal BMI but still have too much body fat.\n\nHowever, BMI is still a useful tool because it can give you an idea of whether your weight is in a healthy range for your height. And, more importantly, it can help identify people who might be at risk for certain health problems, like obesity-related conditions. So, while it's not a perfect measure, it's a good way to get an idea of your overall health and weight status.\n\nIt's also worth noting that BMI is just one part of the picture. Your overall health and well-being depend on many factors, including your diet, physical activity level, and lifestyle choices. So, even if you have a normal BMI, it's still important to make healthy choices to stay healthy and prevent health problems.",
+      "latency_ms": 966.0,
+      "sources": [
+        {
+          "source": "Obesity Management \u2014 PMID 32997947 | Lancet. 2021",
+          "score": 0.4466
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.098,
+        "semantic_similarity": 0.852
+      }
+    },
+    {
+      "question": "how does my immune system actually fight off an infection",
+      "category": "immunology",
+      "ground_truth": "The immune system uses neutrophils and macrophages as first responders and B cells producing antibodies for targeted defence. Phagocytes engulf and destroy pathogens.",
+      "answer": "Fighting off an infection is a remarkable process, and I'm happy to walk you through it.\n\nWhen your immune system detects an invader, like a virus or bacteria, it springs into action. The first line of defense is your skin and mucous membranes, which act as a barrier to prevent the invader from entering your body. If the invader does get inside, your immune system sends out special cells called white blood cells to attack it.\n\nThere are several types of white blood cells, each with its own unique job. Some, like neutrophils, are like the police officers of the immune system \u2013 they quickly rush to the scene to surround and engulf the invader. Others, like lymphocytes, are like the detectives \u2013 they investigate the invader and figure out how to take it down.\n\nWhen a lymphocyte recognizes the invader, it releases chemical signals that alert other immune cells to join the fight. These signals also trigger the production of antibodies, which are like special proteins that can recognize and bind to the invader. This binding process helps mark the invader for destruction, making it easier for other immune cells to find and eliminate it.\n\nAs the immune system works to clear the infection, it also sends out chemical signals to repair any damage that's been done. This is where cells like platelets come in \u2013 they help form blood clots to stop bleeding, and they also release growth factors that help repair damaged tissue.\n\nThroughout the process, your immune system is constantly monitoring the situation and adjusting its response as needed. It's an incredibly complex and coordinated effort, and it's what keeps you healthy and protected from infection.\n\nDoes that make sense? Do you have any other questions about how your immune system fights off infection?",
+      "latency_ms": 3404.9,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5741
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5263
+        },
+        {
+          "source": "COVID-19 Antiviral Therapy \u2014 PMID 34706427 | NEJM. 2021",
+          "score": 0.4543
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.571,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.504,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "why do i get a fever when im sick",
+      "category": "immunology",
+      "ground_truth": "Fever is a controlled immune response where the hypothalamus raises body temperature to inhibit bacterial and viral growth and speed up immune cell activity.",
+      "answer": "You know, when we're sick, our body's natural defense mechanism kicks in to fight off the invading germs or viruses. One of the ways it does this is by raising our body temperature, which is what we feel as a fever.\n\nThink of it like a heat lamp in a greenhouse. The heat lamp helps to create a warm environment that's not suitable for cold-blooded pests like insects, right? Similarly, our body's temperature increase creates an environment that's not suitable for the invading germs or viruses, making it harder for them to survive and multiply.\n\nWhen we have a fever, our body is essentially saying, \"I'm not going to let you take over! I'm going to create a hostile environment for you, and I'm going to fight you off.\" It's a sign that our immune system is working hard to protect us, and that's a good thing.\n\nOf course, sometimes fevers can get a bit too high, and that's when we need to take action to help our body cool down. But in general, a fever is just a sign that our body is doing its job to keep us healthy.",
+      "latency_ms": 1209.3,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4781
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4214
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3984
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.286,
+        "ground_truth_overlap": 0.429,
+        "source_supported": 0.215,
+        "semantic_similarity": 0.732
+      }
+    },
+    {
+      "question": "whats an autoimmune disease and why does the body attack itself",
+      "category": "immunology",
+      "ground_truth": "Autoimmune diseases occur when the immune system mistakenly attacks healthy cells. The cause involves a mix of genetic predisposition and environmental triggers.",
+      "answer": "An autoimmune disease is a condition where your body's immune system mistakenly attacks and damages its own cells, tissues, and organs. Think of it like a misdirected defense system. Normally, your immune system is like a skilled security guard that protects you from invaders like germs and viruses. It identifies the bad guys and leaves the good guys alone.\n\nBut in an autoimmune disease, the security guard gets confused and starts attacking the good guys \u2013 the healthy cells and tissues that belong to you. This can cause a range of problems, from mild to severe, depending on which parts of the body are affected.\n\nImagine your body is like a house with a faulty alarm system. The alarm system is supposed to sound the alarm only when there's an intruder, but in an autoimmune disease, it sounds the alarm all the time, even when there's no intruder. This can lead to a lot of unnecessary damage and harm.\n\nIt's not entirely clear why the immune system gets confused like this, but it's thought to be a combination of genetic, environmental, and hormonal factors that can trigger an autoimmune response. Sometimes, it's a one-time mistake, and sometimes it's a chronic condition that needs ongoing treatment.\n\nThe good news is that there are many effective treatments available to manage autoimmune diseases and reduce symptoms. It's a complex condition, but with the right care and support, people with autoimmune diseases can lead active and fulfilling lives.",
+      "latency_ms": 1168.7,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.7395
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.6286
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5834
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.667,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.468,
+        "semantic_similarity": 0.848
+      }
+    },
+    {
+      "question": "whats the difference between feeling sad and actually having depression",
+      "category": "mental_health",
+      "ground_truth": "Depression is a clinical condition involving persistent low mood, loss of interest, fatigue, sleep changes, and cognitive difficulties lasting more than two weeks.",
+      "answer": "Feeling sad and having depression are two different things. We all feel sad from time to time, and that's a normal part of life. Maybe you lost a loved one, or something didn't go as planned. It's okay to feel down for a while, but when sadness becomes a regular part of your life, and it's affecting your daily activities, relationships, and overall well-being, that's when it might be depression.\n\nThink of it like this: feeling sad is like having a rainy day. It's unpleasant, but it will pass. Depression is like a prolonged, dark cloud that follows you everywhere. It can be hard to shake off, and it can affect many areas of your life.\n\nSome key differences between feeling sad and having depression include:\n\n\u2022 **Duration**: Sadness is usually short-term, while depression can last for weeks, months, or even years.\n\u2022 **Intensity**: Sadness is often a normal, manageable feeling, while depression can be overwhelming and debilitating.\n\u2022 **Impact**: Sadness might affect your mood, but depression can affect your relationships, work, sleep, appetite, and overall quality of life.\n\u2022 **Frequency**: Sadness is an occasional feeling, while depression can become a persistent pattern.\n\nIf you're experiencing persistent feelings of sadness, hopelessness, or a lack of interest in activities you once enjoyed, it's a good idea to talk to a healthcare professional. They can help you determine if you're experiencing depression and develop a plan to manage your symptoms.",
+      "latency_ms": 3585.2,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4311
+        },
+        {
+          "source": "Major Depressive Disorder \u2014 PMID 31617591 | Lancet. 2019",
+          "score": 0.3617
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.352
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.286,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.297,
+        "semantic_similarity": 0.605
+      }
+    },
+    {
+      "question": "can stress actually make you physically sick",
+      "category": "mental_health",
+      "ground_truth": "Chronic stress raises cortisol levels which suppresses immune function, raises blood pressure, disrupts sleep, and increases risk of cardiovascular disease.",
+      "answer": "Stress can indeed have a profound impact on our physical health. When we're under stress, our body's \"fight or flight\" response is triggered, releasing hormones like adrenaline and cortisol into our system. These hormones are meant to help us respond to immediate threats, but when we're under chronic stress, they can start to wear us down.\n\nOne way stress can make us physically sick is by weakening our immune system. When we're under stress, our body diverts energy away from non-essential functions like digestion and immune response, making us more susceptible to illnesses like the common cold or flu.\n\nStress can also contribute to a range of physical symptoms, including headaches, digestive problems, and sleep disturbances. And if we're experiencing chronic stress, it can even lead to more serious health problems like high blood pressure, heart disease, and diabetes.\n\nIt's also worth noting that stress can exacerbate existing medical conditions, making symptoms worse and potentially leading to complications. For example, if you have asthma, stress can trigger asthma attacks, while if you have irritable bowel syndrome (IBS), stress can worsen symptoms like abdominal pain and diarrhea.\n\nSo, while stress itself isn't a physical illness, it can certainly have a significant impact on our physical health. If you're experiencing chronic stress or symptoms that are affecting your daily life, it's a good idea to talk to a healthcare professional about ways to manage your stress and protect your physical health.",
+      "latency_ms": 1647.8,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4817
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4342
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3982
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.508,
+        "semantic_similarity": 0.705
+      }
+    },
+    {
+      "question": "why is too much salt bad for you",
+      "category": "nutrition",
+      "ground_truth": "Excess sodium causes the body to retain water, raising blood volume and blood pressure, which strains the heart and arteries and increases risk of hypertension.",
+      "answer": "Too much salt can be bad for you in several ways. When you consume too much salt, your body holds onto water to dilute the salt. This can lead to swelling in your feet, ankles, and hands, which is often referred to as edema. It can also put extra pressure on your kidneys, which can be a problem if you already have kidney issues.\n\nIn the long term, a high-sodium diet can increase your blood pressure. This is because your body has to work harder to process the excess salt, which causes your blood vessels to constrict. When your blood vessels constrict, your heart has to pump harder to get blood flowing through your body, which can raise your blood pressure.\n\nSo, it's generally recommended to limit your sodium intake to less than 2,300 milligrams per day. If you have high blood pressure or other heart-related issues, you may need to aim for even lower sodium intake, around 1,500 milligrams per day.",
+      "latency_ms": 3563.6,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3559
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.571,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.365,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "what does the liver actually do",
+      "category": "organ_function",
+      "ground_truth": "The liver filters blood, produces bile for digestion, metabolises drugs and toxins, synthesises proteins, and stores glycogen for energy.",
+      "answer": "The liver is an incredibly important organ in our body. It's like the unsung hero of our digestive system. So, what does it do? Well, the liver plays a huge role in filtering the blood that comes from our digestive tract. It helps remove toxins, waste products, and excess substances that we don't need. Think of it like a filter in your coffee machine - it keeps the good stuff in and the bad stuff out.\n\nThe liver also helps break down fats, which are an important source of energy for our bodies. It converts these fats into a usable form, so our cells can use them for energy. Plus, the liver produces bile, which is a digestive juice that helps us absorb fats and fat-soluble vitamins.\n\nBut that's not all - the liver also helps regulate blood sugar levels, produces proteins that help our blood clot, and even stores glycogen, which is a complex carbohydrate that's converted into glucose when we need it. It's like a storage tank for our body's energy needs.\n\nLastly, the liver helps remove excess hormones and other substances from our bloodstream. It's like a recycling center, breaking down and reusing what we don't need.\n\nSo, as you can see, the liver is a pretty amazing organ that works hard behind the scenes to keep us healthy and functioning properly.",
+      "latency_ms": 3603.5,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4103
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3975
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.3963
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.714,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.278,
+        "semantic_similarity": 0.725
+      }
+    },
+    {
+      "question": "what do the kidneys do and how do i know if they arent working properly",
+      "category": "organ_function",
+      "ground_truth": "Kidneys filter waste from blood, regulate fluid balance, and control blood pressure. Signs of dysfunction include swelling, fatigue, changes in urination, and back pain.",
+      "answer": "The kidneys are two small, bean-shaped organs located in your lower back, just above the waistline. They play a vital role in keeping your body healthy by filtering waste and excess fluids from your blood. Think of them like a filter system that helps remove the bad stuff from your blood so your body can function properly.\n\nOne of the main jobs of the kidneys is to remove waste products, like urea, from your blood. They also help regulate the balance of fluids in your body, which is important for maintaining healthy blood pressure. Additionally, the kidneys help control the levels of electrolytes, like sodium and potassium, in your blood.\n\nNow, if your kidneys aren't working properly, you might notice some changes in your body. Here are a few signs that could indicate a problem:\n\n* You might feel tired or weak, even after getting enough rest.\n* You could experience swelling in your feet, ankles, or hands, which is called edema.\n* Your urine might be dark yellow or have a strong odor, or you might notice that you're urinating more frequently.\n* You might feel pain or discomfort in your back, sides, or abdomen.\n* You could experience nausea or vomiting.\n* In some cases, you might notice that you're not producing enough urine, or that your urine is foamy or bloody.\n\nKeep in mind that these symptoms can be caused by many different things, so it's always best to talk to a doctor if you're concerned about your kidneys or if you're experiencing any of these symptoms. They can help determine if there's a problem and recommend the best course of action.",
+      "latency_ms": 4160.2,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.58
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.5429
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4939
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.429,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.487,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "what are the general warning signs that could indicate cancer",
+      "category": "oncology",
+      "ground_truth": "General cancer warning signs include unexplained weight loss, persistent fatigue, unusual lumps, changes in bowel habits, persistent cough, and unexplained bleeding.",
+      "answer": "When it comes to breast cancer, there are some common warning signs that you should be aware of. Keep in mind that not all lumps or changes are cancerous, but it's always better to be safe than sorry. Here are some general warning signs to look out for:\n\n* A new lump or thickening in your breast or underarm area\n* A change in the size or shape of your breast\n* Dimpling or puckering of the skin\n* Redness or scaliness of the skin\n* Nipple discharge or tenderness\n* A change in the way your nipple looks or feels\n* Swelling in the armpit or near the collarbone\n\nIf you notice any of these changes, it's essential to talk to your doctor. They can help determine if the change is something to worry about or if it's just a harmless lump or fibrocystic change.\n\nIt's also a good idea to get into the habit of doing regular breast self-exams. This can help you become familiar with the normal look and feel of your breasts and make it easier to notice any changes. If you're unsure about what to look for or how to do a breast self-exam, your doctor can provide guidance and support.\n\nRemember, early detection is key when it comes to breast cancer. If you're concerned about any changes or lumps, don't hesitate to reach out to your doctor. They're there to help you and provide peace of mind.",
+      "latency_ms": 7294.4,
+      "sources": [
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4834
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4732
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4725
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.286,
+        "ground_truth_overlap": 0.812,
+        "source_supported": 0.495,
+        "semantic_similarity": null
+      }
+    },
+    {
+      "question": "ive been gaining weight and feeling tired all the time, could it be my thyroid",
+      "category": "endocrine",
+      "ground_truth": "Hypothyroidism occurs when the thyroid produces too little hormone, causing weight gain, fatigue, cold intolerance, and depression.",
+      "answer": "You're feeling a bit sluggish and gaining weight, huh? That can be really frustrating and concerning. Let's explore this together. Weight gain and fatigue can be symptoms of many things, but it's always a good idea to get checked out by a doctor to rule out any potential underlying issues.\n\nOne possibility we can consider is a thyroid issue. The thyroid gland plays a big role in regulating our metabolism, which can affect how we feel and how our bodies process energy. If your thyroid isn't working properly, it can lead to fatigue, weight gain, and other symptoms.\n\nHowever, there are many other potential causes for these symptoms as well. It's also possible that you might be experiencing stress, lack of sleep, or other factors that could be contributing to how you're feeling.\n\nI would recommend making an appointment with your primary care physician or an endocrinologist to get a proper evaluation. They can run some tests to check your thyroid function and rule out other potential causes of your symptoms. They'll also be able to provide you with a more personalized assessment and guidance on what might be going on.\n\nIn the meantime, have you noticed any other symptoms that might be related to your thyroid, such as changes in your hair, skin, or menstrual cycle?",
+      "latency_ms": 4609.8,
+      "sources": [
+        {
+          "source": "Hypothyroidism Management \u2014 PMID 31413600 | Lancet. 2019",
+          "score": 0.4794
+        },
+        {
+          "source": "Hyperthyroidism Treatment \u2014 PMID 30566890 | NEJM. 2019",
+          "score": 0.4778
+        },
+        {
+          "source": "Gale Encyclopedia of Medicine",
+          "score": 0.4024
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.429,
+        "ground_truth_overlap": 0.909,
+        "source_supported": 0.295,
+        "semantic_similarity": 0.445
+      }
+    },
+    {
+      "question": "why is sleep so important for your health",
+      "category": "lifestyle",
+      "ground_truth": "Sleep is essential for immune function, memory consolidation, hormone regulation, tissue repair, and cardiovascular health. Chronic deprivation raises disease risk.",
+      "answer": "Sleep is incredibly important for our overall health and wellbeing. When we sleep, our body gets to rest and repair itself, which is essential for maintaining our physical and mental health.\n\nThink of sleep like a recharge for your body. During sleep, our body repairs and regenerates damaged cells, builds bone and muscle, and strengthens our immune system. It's also when our brain processes and consolidates memories, so sleep is essential for learning and memory.\n\nSleep also plays a critical role in our emotional and mental health. When we don't get enough sleep, we can feel irritable, anxious, and depressed. On the other hand, getting enough sleep can help us feel more balanced, calm, and focused.\n\nIn addition, sleep is closely linked to our physical health. Chronic sleep deprivation has been linked to an increased risk of obesity, diabetes, high blood pressure, and cardiovascular disease. So, getting enough sleep is essential for maintaining a healthy weight, managing chronic conditions, and reducing our risk of developing serious health problems.\n\nOverall, sleep is a vital part of our daily routine, and it's essential for maintaining our physical and mental health. By prioritizing sleep and making it a priority, we can wake up feeling refreshed, revitalized, and ready to take on the day.",
+      "latency_ms": 1269.8,
+      "sources": [
+        {
+          "source": "Insomnia Treatment Guidelines \u2014 PMID 30970188 | Lancet. 2019",
+          "score": 0.4192
+        },
+        {
+          "source": "Obstructive Sleep Apnoea Management \u2014 PMID 32160948 | Lancet. 2020",
+          "score": 0.3785
+        }
+      ],
+      "scores": {
+        "keyword_recall": 0.429,
+        "ground_truth_overlap": 1.0,
+        "source_supported": 0.229,
+        "semantic_similarity": 0.742
+      }
+    }
+  ]
+}

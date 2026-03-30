@@ -55,14 +55,10 @@ EMBED_URL = f"https://router.huggingface.co/hf-inference/models/{HF_EMBEDDING_MO
 
 # ── Embedding ─────────────────────────────────────────────────────────────────
 
-def embed_texts(texts: list[str]) -> list[list[float]]:
+def embed_texts(texts: list[str], max_retries: int = 4) -> list[list[float]]:
     """
     Embed a batch of texts in a single HF Inference API call.
-
-    The feature-extraction API accepts a list of strings and returns a list
-    of vectors in one round-trip, which is far faster than one call per text.
-    The outer batch loop in main() keeps individual payloads to a manageable
-    size (default: 16 texts) so we don't hit request size or timeout limits.
+    Retries with exponential backoff on timeout or 503.
     """
     headers = {
         "Authorization": f"Bearer {HF_API_TOKEN}",
@@ -70,21 +66,34 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
     }
     payload = {"inputs": texts, "options": {"wait_for_model": True}}
 
-    with httpx.Client(timeout=120.0) as client:
-        resp = client.post(EMBED_URL, json=payload, headers=headers)
+    for attempt in range(1, max_retries + 1):
+        try:
+            with httpx.Client(timeout=180.0) as client:
+                resp = client.post(EMBED_URL, json=payload, headers=headers)
 
-    if resp.status_code != 200:
-        logger.error("Embedding API error %s: %s", resp.status_code, resp.text[:300])
-        raise RuntimeError(f"HF Inference API returned {resp.status_code}")
+            if resp.status_code in (503, 504):
+                wait = 2 ** attempt
+                logger.warning("HF API %d (attempt %d/%d) — retrying in %ds", resp.status_code, attempt, max_retries, wait)
+                time.sleep(wait)
+                continue
 
-    result = resp.json()
-    # Batch input → list of vectors: [[0.1, ...], [0.2, ...], ...]
-    if isinstance(result, list) and result and isinstance(result[0], list):
-        return result
-    # Single-text fallback → one vector (shouldn't happen with list input, but be safe)
-    if isinstance(result, list) and result and isinstance(result[0], float):
-        return [result]
-    raise ValueError(f"Unexpected embedding response shape: {type(result)}")
+            if resp.status_code != 200:
+                logger.error("Embedding API error %s: %s", resp.status_code, resp.text[:300])
+                raise RuntimeError(f"HF Inference API returned {resp.status_code}")
+
+            result = resp.json()
+            if isinstance(result, list) and result and isinstance(result[0], list):
+                return result
+            if isinstance(result, list) and result and isinstance(result[0], float):
+                return [result]
+            raise ValueError(f"Unexpected embedding response shape: {type(result)}")
+
+        except (httpx.ReadTimeout, httpx.ConnectTimeout) as exc:
+            wait = 2 ** attempt
+            logger.warning("Timeout on attempt %d/%d — retrying in %ds (%s)", attempt, max_retries, wait, exc)
+            time.sleep(wait)
+
+    raise RuntimeError(f"Embedding failed after {max_retries} attempts")
 
 
 # ── Pinecone upsert ───────────────────────────────────────────────────────────
@@ -142,7 +151,8 @@ def main(data_path: str, batch_size: int) -> None:
     total_upserted = 0
     for start in range(0, len(docs), batch_size):
         batch = docs[start : start + batch_size]
-        texts = [d["text"] for d in batch]
+        # all-MiniLM-L6-v2 max is 256 tokens (~200 words). Truncate to avoid timeouts.
+        texts = [" ".join(d["text"].split()[:200]) for d in batch]
 
         logger.info(
             "Embedding batch %d–%d of %d...",
