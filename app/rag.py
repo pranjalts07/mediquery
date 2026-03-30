@@ -1,21 +1,4 @@
-"""
-app/rag.py
-Retrieval-Augmented Generation pipeline with conversation memory.
-
-All I/O is fully async:
-  - HF API calls use httpx.AsyncClient (never blocks the event loop)
-  - Pinecone index.query() is synchronous, wrapped in asyncio.to_thread()
-
-Two entry points:
-  run_rag()        → returns a dict {answer, sources} — used by POST /chat
-  run_rag_stream() → async generator that yields SSE-formatted strings — used by POST /chat/stream
-
-Security notes:
-  - API keys are passed via the Settings object; never logged or returned to callers.
-  - Error responses from upstream APIs are logged at status-code level only.
-  - The Pinecone client is cached (lru_cache). Cache key includes api_key so a
-    key rotation clears the cache.
-"""
+"""app/rag.py — RAG pipeline with conversation memory."""
 from __future__ import annotations
 
 import asyncio
@@ -31,10 +14,7 @@ from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
-# Minimum cosine similarity a Pinecone result must have to be used.
 MIN_SCORE = 0.35
-
-# Cross-encoder keeps this many chunks after reranking.
 RERANKER_TOP_N = 3
 
 SYSTEM_PROMPT = """You are MediQuery, a warm, knowledgeable medical information assistant with the bedside manner of a trusted doctor friend.
@@ -70,8 +50,6 @@ Patient question: {question}
 {instruction}"""
 
 
-# ── Embedding ──────────────────────────────────────────────────────────────────
-
 async def embed_query(text: str, settings: Settings) -> list[float]:
     url = f"https://router.huggingface.co/hf-inference/models/{settings.hf_embedding_model}/pipeline/feature-extraction"
     headers = {
@@ -94,8 +72,6 @@ async def embed_query(text: str, settings: Settings) -> list[float]:
         return result
     raise ValueError(f"Unexpected embedding response shape: {type(result)}")
 
-
-# ── Retrieval ──────────────────────────────────────────────────────────────────
 
 @lru_cache(maxsize=1)
 def _get_pinecone_index(api_key: str, host: str):
@@ -127,19 +103,8 @@ async def retrieve(query_vector: list[float], settings: Settings) -> list[dict[s
     return results
 
 
-# ── Reranking ──────────────────────────────────────────────────────────────────
-
 async def rerank(question: str, chunks: list[dict], settings: Settings) -> list[dict]:
-    """
-    Cross-encoder reranking via HF Inference API.
-
-    Bi-encoder (Pinecone) optimises for speed and recall — it finds roughly
-    the right documents but can mis-order them. A cross-encoder sees the full
-    (query, passage) pair and scores relevance far more accurately.
-
-    We retrieve top_k=8 broad candidates then rerank to RERANKER_TOP_N=3.
-    Falls back to the original Pinecone order if the API call fails.
-    """
+    """Cross-encoder reranking via HF Inference API. Falls back to Pinecone order on failure."""
     if len(chunks) <= RERANKER_TOP_N:
         return chunks
 
@@ -162,7 +127,7 @@ async def rerank(question: str, chunks: list[dict], settings: Settings) -> list[
 
         raw = resp.json()
 
-        # Parse two common response shapes:
+        # Two common response shapes:
         # Shape A — flat floats:        [0.92, 0.41, ...]
         # Shape B — label/score dicts:  [[{"label": "LABEL_1", "score": 0.92}], ...]
         if raw and isinstance(raw[0], (int, float)):
@@ -182,8 +147,6 @@ async def rerank(question: str, chunks: list[dict], settings: Settings) -> list[
         logger.warning("Reranker failed (%s) — using original Pinecone order", exc)
         return chunks[:RERANKER_TOP_N]
 
-
-# ── Generation ─────────────────────────────────────────────────────────────────
 
 def _build_messages(prompt: str, history: list[dict] | None) -> list[dict]:
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -227,13 +190,7 @@ async def generate(prompt: str, settings: Settings, history: list[dict] | None =
 async def generate_stream(
     prompt: str, settings: Settings, history: list[dict] | None = None
 ) -> AsyncIterator[str]:
-    """
-    Streaming generation — yields raw text tokens as they arrive from the HF API.
-
-    The HF chat completions endpoint returns standard OpenAI-compatible SSE:
-      data: {"choices": [{"delta": {"content": "token"}}]}
-      data: [DONE]
-    """
+    """Streaming generation — yields raw text tokens as they arrive from the HF API."""
     url = "https://router.huggingface.co/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {settings.hf_api_token}",
@@ -268,7 +225,17 @@ async def generate_stream(
                     continue
 
 
-# ── RAG entry points ───────────────────────────────────────────────────────────
+def _retrieval_query(question: str, history: list[dict] | None) -> str:
+    """Prepend the last user turn for very short follow-up messages that lack medical keywords."""
+    words = question.strip().split()
+    if len(words) <= 5 and history:
+        last_user = next(
+            (m["content"] for m in reversed(history) if m.get("role") == "user"), None
+        )
+        if last_user:
+            return f"{last_user} — {question}"
+    return question
+
 
 async def run_rag(
     question: str,
@@ -279,7 +246,8 @@ async def run_rag(
     """Full RAG pipeline — returns {answer, sources}. Used by POST /chat."""
     logger.info("RAG query received (length=%d)", len(question))
 
-    query_vector = await embed_query(question, settings)
+    retrieval_q = _retrieval_query(question, history)
+    query_vector = await embed_query(retrieval_q, settings)
     chunks = await retrieve(query_vector, settings)
     logger.info("Retrieved %d chunks from Pinecone (above score threshold)", len(chunks))
 
@@ -328,7 +296,8 @@ async def run_rag_stream(
     logger.info("RAG stream query received (length=%d)", len(question))
 
     try:
-        query_vector = await embed_query(question, settings)
+        retrieval_q = _retrieval_query(question, history)
+        query_vector = await embed_query(retrieval_q, settings)
         chunks = await retrieve(query_vector, settings)
         logger.info("Retrieved %d chunks (stream path)", len(chunks))
 

@@ -1,6 +1,4 @@
-"""
-tests/test_scoring.py
-Unit tests for the evaluation scoring functions in scripts/evaluate_mediquery.py.
+"""tests/test_scoring.py — Unit tests for scoring functions in evaluate_mediquery.py.
 
 Run with:
     pytest tests/test_scoring.py -v
@@ -9,7 +7,6 @@ import math
 import sys
 from pathlib import Path
 
-# The scripts/ directory is not a package — add it to the path so we can import
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from evaluate_mediquery import (
     _cosine,
@@ -19,8 +16,6 @@ from evaluate_mediquery import (
     score_source_supported,
 )
 
-
-# ── _normalize ────────────────────────────────────────────────────────────────
 
 class TestNormalize:
     def test_strips_punctuation(self):
@@ -40,8 +35,6 @@ class TestNormalize:
         assert "risk" in result
 
 
-# ── _cosine ───────────────────────────────────────────────────────────────────
-
 class TestCosine:
     def test_identical_vectors_score_one(self):
         v = [1.0, 0.0, 0.0]
@@ -60,8 +53,6 @@ class TestCosine:
     def test_zero_vector_returns_zero(self):
         assert _cosine([0.0, 0.0], [1.0, 1.0]) == 0.0
 
-
-# ── score_keyword_recall ──────────────────────────────────────────────────────
 
 class TestKeywordRecall:
     def test_all_keywords_present(self):
@@ -89,8 +80,6 @@ class TestKeywordRecall:
         assert score_keyword_recall(answer, keywords) == 1.0
 
 
-# ── score_gt_overlap ──────────────────────────────────────────────────────────
-
 class TestGtOverlap:
     def test_identical_text_scores_one(self):
         text = "insulin pancreas glucose hyperglycemia"
@@ -105,7 +94,6 @@ class TestGtOverlap:
         # Words with 4 chars or fewer are excluded from overlap calculation
         answer = "the and for with"
         gt = "the and for with"
-        # All words are ≤4 chars, so gt_words is empty → returns 0.0
         assert score_gt_overlap(answer, gt) == 0.0
 
     def test_partial_overlap(self):
@@ -115,13 +103,10 @@ class TestGtOverlap:
         assert 0.0 < score < 1.0
 
     def test_capped_at_one(self):
-        # Answer repeats ground-truth words many times — should cap at 1.0
         answer = "glucose glucose glucose glucose glucose insulin insulin insulin"
         gt = "glucose insulin"
         assert score_gt_overlap(answer, gt) == 1.0
 
-
-# ── score_source_supported ────────────────────────────────────────────────────
 
 class TestSourceSupported:
     def test_no_sources_returns_zero(self):

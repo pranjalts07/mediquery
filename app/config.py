@@ -1,17 +1,4 @@
-"""
-app/config.py
-Centralised configuration loaded from environment variables.
-
-Security contract (OWASP A02:2021 Cryptographic Failures / A05 Misconfiguration):
-  - All secrets are injected at runtime — NEVER hardcoded in source code.
-  - For local development, copy .env.example → .env and fill in values.
-    The .env file is listed in .gitignore and must never be committed.
-  - In production (Azure App Service), secrets are set as Application Settings,
-    which are injected as environment variables and never appear in source or logs.
-  - The Settings dataclass is frozen (immutable) to prevent accidental mutation.
-  - __repr__ is overridden to ensure secrets cannot be leaked via print() or
-    repr() calls in logs or error tracebacks.
-"""
+"""app/config.py — Settings loaded from environment variables."""
 import os
 from dataclasses import dataclass
 
@@ -38,10 +25,6 @@ class Settings:
     max_new_tokens: int
 
     def __repr__(self) -> str:
-        """
-        Custom repr that masks all secret fields.
-        Prevents accidental key exposure in logs, tracebacks, or debug output.
-        """
         return (
             f"Settings("
             f"hf_api_token=***REDACTED***, "
@@ -59,7 +42,6 @@ class Settings:
 
 def get_settings() -> Settings:
     def _require(key: str) -> str:
-        """Load a required env var; raise immediately with a clear message if absent."""
         val = os.getenv(key, "").strip()
         if not val:
             raise RuntimeError(

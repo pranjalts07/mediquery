@@ -1,24 +1,8 @@
-"""
-app/safety.py
-Lightweight keyword-based safety layer.
-
-Two-tier emergency detection:
-  1. Crisis keywords — suicide/self-harm terms are always high-risk regardless
-     of how they appear in a sentence.  False negative (missing a real crisis)
-     is far more dangerous than a false positive here.
-
-  2. Acute medical phrases — "heart attack" and "stroke" are core medical topics
-     that the chatbot must be able to discuss.  Blocking any message that contains
-     these words would make a medical assistant useless ("what causes heart attacks?"
-     would be refused).  Instead, we only block when the message also contains
-     first-person present-tense emergency indicators ("I'm having", "I can't breathe").
-"""
+"""app/safety.py — Keyword-based safety layer."""
 from __future__ import annotations
 import re
 
-# ── Tier 1: always-block crisis keywords ─────────────────────────────────────
-# Mental health crises and direct emergency calls.
-# The risk of missing a genuine crisis outweighs occasional false positives.
+# Tier 1: mental health crises and direct emergency calls — always block.
 _CRISIS_KEYWORDS: frozenset[str] = frozenset({
     "suicide",
     "suicidal",
@@ -35,11 +19,8 @@ _CRISIS_KEYWORDS: frozenset[str] = frozenset({
     "call 112",
 })
 
-# ── Tier 2: medical emergency terms + acute indicators ───────────────────────
-# Only block when BOTH a medical emergency term AND a first-person acute
-# indicator appear in the same message.
-# "what causes heart attacks?" → no acute indicator → passes through to RAG
-# "I think I'm having a heart attack" → blocked immediately
+# Tier 2: only block when BOTH a medical emergency term AND a first-person
+# acute indicator appear — so "what causes heart attacks?" passes through.
 _MEDICAL_EMERGENCY_TERMS: frozenset[str] = frozenset({
     "heart attack",
     "stroke",
@@ -72,7 +53,6 @@ _ACUTE_INDICATORS: tuple[str, ...] = (
     "they're having",
 )
 
-# ── Prompt injection / out-of-scope ──────────────────────────────────────────
 _OUT_OF_SCOPE_KEYWORDS: tuple[str, ...] = (
     "hack",
     "exploit",
@@ -83,7 +63,6 @@ _OUT_OF_SCOPE_KEYWORDS: tuple[str, ...] = (
     "dan mode",
 )
 
-# ── Canned responses ─────────────────────────────────────────────────────────
 EMERGENCY_RESPONSE = (
     "⚠️ **This sounds like a medical emergency.** "
     "Please call your local emergency number immediately "
@@ -98,7 +77,6 @@ REFUSAL_RESPONSE = (
     "I'm not able to help with that request."
 )
 
-# ── Casual-response patterns ──────────────────────────────────────────────────
 _GREETING_PATTERNS: tuple[str, ...] = (
     r"^h+e+y+[!.]*$", r"^h+i+[!.]*$", r"^hello[!.]*$", r"^howdy[!.]*$",
     r"^hiya[!.]*$", r"^yo[!.]*$", r"^sup[!.]*$",
@@ -139,8 +117,6 @@ def _get_casual_response(cleaned: str) -> str | None:
     return None
 
 
-# ── Public interface ──────────────────────────────────────────────────────────
-
 class SafetyResult:
     __slots__ = ("blocked", "response")
 
@@ -153,23 +129,19 @@ def check(text: str) -> SafetyResult:
     lowered = text.lower().strip()
     cleaned = re.sub(r"[!?.,:]+$", "", lowered).strip()
 
-    # Tier 1 — crisis keywords (always block)
     for kw in _CRISIS_KEYWORDS:
         if kw in lowered:
             return SafetyResult(blocked=True, response=EMERGENCY_RESPONSE)
 
-    # Tier 2 — medical emergency terms need an acute first-person indicator
     has_medical_term = any(term in lowered for term in _MEDICAL_EMERGENCY_TERMS)
     has_acute = any(phrase in lowered for phrase in _ACUTE_INDICATORS)
     if has_medical_term and has_acute:
         return SafetyResult(blocked=True, response=EMERGENCY_RESPONSE)
 
-    # Out-of-scope / prompt injection
     for kw in _OUT_OF_SCOPE_KEYWORDS:
         if kw in lowered:
             return SafetyResult(blocked=True, response=REFUSAL_RESPONSE)
 
-    # Casual conversational messages (short messages only)
     if len(cleaned.split()) <= 6:
         casual = _get_casual_response(cleaned)
         if casual:

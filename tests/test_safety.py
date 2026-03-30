@@ -1,6 +1,4 @@
-"""
-tests/test_safety.py
-Unit tests for the two-tier emergency detection in app/safety.py.
+"""tests/test_safety.py — Unit tests for app/safety.py.
 
 Run with:
     pytest tests/test_safety.py -v
@@ -8,8 +6,6 @@ Run with:
 import pytest
 from app.safety import check
 
-
-# ── Tier 1: crisis keywords — always block ────────────────────────────────────
 
 class TestCrisisKeywords:
     def test_suicide_blocked(self):
@@ -34,12 +30,9 @@ class TestCrisisKeywords:
         assert check("there is severe bleeding").blocked
 
 
-# ── Tier 2: medical emergency terms need acute first-person context ───────────
-
 class TestMedicalEmergencyTwoTier:
-    """Questions ABOUT these topics must pass. Only first-person acute phrases block."""
+    """General questions about these topics must pass. First-person acute phrases block."""
 
-    # ── Should PASS (medical knowledge questions) ──────────────────────────────
     def test_heart_attack_question_passes(self):
         assert not check("what causes heart attacks?").blocked
 
@@ -58,7 +51,6 @@ class TestMedicalEmergencyTwoTier:
     def test_breathing_question_passes(self):
         assert not check("why do I get short of breath when I exercise?").blocked
 
-    # ── Should BLOCK (first-person acute emergency) ────────────────────────────
     def test_having_heart_attack_blocked(self):
         assert check("I think I'm having a heart attack").blocked
 
@@ -71,8 +63,6 @@ class TestMedicalEmergencyTwoTier:
     def test_help_me_with_emergency_blocked(self):
         assert check("please help me I'm having chest pain right now").blocked
 
-
-# ── Prompt injection / out of scope ──────────────────────────────────────────
 
 class TestOutOfScope:
     def test_jailbreak_blocked(self):
@@ -87,8 +77,6 @@ class TestOutOfScope:
     def test_normal_question_not_blocked(self):
         assert not check("what is the difference between type 1 and type 2 diabetes?").blocked
 
-
-# ── Casual responses ──────────────────────────────────────────────────────────
 
 class TestCasualResponses:
     def test_greeting_blocked_with_response(self):
@@ -107,11 +95,8 @@ class TestCasualResponses:
         assert "take care" in result.response.lower()
 
     def test_normal_question_not_casual_blocked(self):
-        # Long medical question should never be caught by casual filter
         assert not check("what are the long-term effects of taking ibuprofen every day?").blocked
 
-
-# ── Blocked result has a response ────────────────────────────────────────────
 
 class TestBlockedResultHasResponse:
     def test_crisis_result_has_response(self):

@@ -1,22 +1,10 @@
-"""
-scripts/ingest.py
-Ingestion pipeline for MediQuery knowledge base.
+"""scripts/ingest.py — Ingestion pipeline for the MediQuery knowledge base.
 
 Usage:
     python scripts/ingest.py [--data data/sample_knowledge.jsonl] [--batch-size 32]
 
-What it does:
-  1. Reads documents from a .jsonl file (one JSON object per line)
-  2. Embeds each document's text using the HF Inference API
-     (sentence-transformers/all-MiniLM-L6-v2 → 384-dim vectors)
-  3. Upserts all vectors into Pinecone in batches
-
 Each JSONL line must have at minimum:
     { "id": "unique-id", "text": "document text", "source": "source name" }
-
-Prerequisites:
-    pip install -r requirements.txt
-    Set environment variables (see .env.example)
 """
 from __future__ import annotations
 
@@ -40,8 +28,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ingest")
 
-# ── Config (from env) ─────────────────────────────────────────────────────────
-
 HF_API_TOKEN = os.environ["HF_API_TOKEN"]
 HF_EMBEDDING_MODEL = os.getenv(
     "HF_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
@@ -53,13 +39,8 @@ PINECONE_HOST = os.environ["PINECONE_HOST"]
 EMBED_URL = f"https://router.huggingface.co/hf-inference/models/{HF_EMBEDDING_MODEL}/pipeline/feature-extraction"
 
 
-# ── Embedding ─────────────────────────────────────────────────────────────────
-
 def embed_texts(texts: list[str], max_retries: int = 4) -> list[list[float]]:
-    """
-    Embed a batch of texts in a single HF Inference API call.
-    Retries with exponential backoff on timeout or 503.
-    """
+    """Embed a batch of texts. Retries with exponential backoff on timeout or 503."""
     headers = {
         "Authorization": f"Bearer {HF_API_TOKEN}",
         "Content-Type": "application/json",
@@ -96,8 +77,6 @@ def embed_texts(texts: list[str], max_retries: int = 4) -> list[list[float]]:
     raise RuntimeError(f"Embedding failed after {max_retries} attempts")
 
 
-# ── Pinecone upsert ───────────────────────────────────────────────────────────
-
 def upsert_batch(index, records: list[dict]) -> None:
     vectors = []
     for rec in records:
@@ -114,15 +93,12 @@ def upsert_batch(index, records: list[dict]) -> None:
     index.upsert(vectors=vectors)
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-
 def main(data_path: str, batch_size: int) -> None:
     path = Path(data_path)
     if not path.exists():
         logger.error("Data file not found: %s", path)
         sys.exit(1)
 
-    # Load documents
     docs = []
     with open(path) as f:
         for line_no, line in enumerate(f, 1):
@@ -142,20 +118,18 @@ def main(data_path: str, batch_size: int) -> None:
         logger.error("No valid documents found. Exiting.")
         sys.exit(1)
 
-    # Connect to Pinecone
     pc = Pinecone(api_key=PINECONE_API_KEY)
     index = pc.Index(host=PINECONE_HOST)
     logger.info("Connected to Pinecone index: %s", PINECONE_INDEX_NAME)
 
-    # Process in batches
     total_upserted = 0
     for start in range(0, len(docs), batch_size):
         batch = docs[start : start + batch_size]
-        # all-MiniLM-L6-v2 max is 256 tokens (~200 words). Truncate to avoid timeouts.
+        # all-MiniLM-L6-v2 max is 256 tokens (~200 words)
         texts = [" ".join(d["text"].split()[:200]) for d in batch]
 
         logger.info(
-            "Embedding batch %d–%d of %d...",
+            "Embedding batch %d-%d of %d...",
             start + 1,
             min(start + batch_size, len(docs)),
             len(docs),
@@ -173,11 +147,10 @@ def main(data_path: str, batch_size: int) -> None:
 
         logger.info("Upserted %d/%d vectors", total_upserted, len(docs))
 
-        # Polite rate-limit pause between batches
         if start + batch_size < len(docs):
             time.sleep(0.5)
 
-    logger.info("✅ Ingestion complete. %d vectors stored in Pinecone.", total_upserted)
+    logger.info("Ingestion complete. %d vectors stored in Pinecone.", total_upserted)
 
 
 if __name__ == "__main__":

@@ -1,23 +1,13 @@
-"""
-scripts/fetch_pubmed.py
-Fetches real peer-reviewed abstracts from PubMed (NIH) and saves them
-as a JSONL knowledge base for MediQuery.
+"""scripts/fetch_pubmed.py — Fetch PubMed abstracts as a JSONL knowledge base.
 
-NO API KEY REQUIRED — PubMed's E-utilities API is completely free and open.
+No API key required — PubMed's E-utilities API is free and open.
 
 Usage:
     python scripts/fetch_pubmed.py
-    python scripts/fetch_pubmed.py --topics custom --out data/pubmed_knowledge.jsonl
+    python scripts/fetch_pubmed.py --out data/pubmed_knowledge.jsonl
 
 Then ingest into Pinecone:
     python scripts/ingest.py --data data/pubmed_knowledge.jsonl --batch-size 16
-
-Why PubMed?
-    - 35 million peer-reviewed biomedical papers
-    - Maintained by the US National Library of Medicine (NIH)
-    - Each abstract is a self-contained clinical chunk — no manual splitting
-    - Real citations: PMID, journal, authors, year → impressive source display
-    - Same database used by medical researchers and clinical NLP systems worldwide
 """
 from __future__ import annotations
 
@@ -35,17 +25,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger("fetch_pubmed")
 
-# ── PubMed API endpoints ──────────────────────────────────────────────────────
-
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 EFETCH_URL  = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
-# ── Search topics ─────────────────────────────────────────────────────────────
 # Each entry: (search_query, max_results, friendly_label)
-# Queries use PubMed syntax: [MeSH] = Medical Subject Heading (controlled vocabulary)
-# hasabstract = only papers with a full abstract
-# free full text = publicly available
-
 TOPICS = [
     # Cardiovascular
     ("hypertension treatment guidelines[Title/Abstract] hasabstract",           40, "Hypertension"),
@@ -104,8 +87,6 @@ TOPICS = [
 ]
 
 
-# ── PubMed fetch functions ────────────────────────────────────────────────────
-
 def search_pmids(query: str, max_results: int, client: httpx.Client) -> list[str]:
     """Search PubMed and return a list of PMIDs."""
     params = {
@@ -122,11 +103,7 @@ def search_pmids(query: str, max_results: int, client: httpx.Client) -> list[str
 
 
 def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
-    """
-    Fetch full abstract records for a list of PMIDs using PubMed's
-    efetch endpoint in JSON-compatible XML mode, parsed manually.
-    Returns list of {pmid, title, abstract, authors, journal, year} dicts.
-    """
+    """Fetch full abstract records for a list of PMIDs. Returns list of dicts."""
     if not pmids:
         return []
 
@@ -139,7 +116,6 @@ def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
     resp = client.get(EFETCH_URL, params=params)
     resp.raise_for_status()
 
-    # Parse XML with stdlib (no lxml dependency)
     import xml.etree.ElementTree as ET
     root = ET.fromstring(resp.text)
 
@@ -149,7 +125,6 @@ def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
             pmid = article.findtext(".//PMID", "").strip()
             title = article.findtext(".//ArticleTitle", "").strip()
 
-            # Abstract — may have multiple AbstractText sections
             abstract_parts = article.findall(".//AbstractText")
             abstract = " ".join(
                 (p.get("Label", "") + ": " if p.get("Label") else "") + (p.text or "")
@@ -157,9 +132,8 @@ def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
             ).strip()
 
             if not abstract or len(abstract.split()) < 30:
-                continue  # skip papers without a usable abstract
+                continue
 
-            # Authors
             authors = []
             for author in article.findall(".//Author")[:3]:
                 last = author.findtext("LastName", "")
@@ -170,7 +144,6 @@ def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
             if len(article.findall(".//Author")) > 3:
                 author_str += " et al."
 
-            # Journal + year
             journal = article.findtext(".//Journal/Title", "") or \
                       article.findtext(".//Journal/ISOAbbreviation", "")
             year = article.findtext(".//PubDate/Year", "") or \
@@ -193,14 +166,9 @@ def fetch_abstracts(pmids: list[str], client: httpx.Client) -> list[dict]:
 
 
 def build_record(rec: dict, topic_label: str) -> dict:
-    """
-    Convert a PubMed record into a MediQuery JSONL record.
-    The text combines title + abstract for richer embedding.
-    The source field shows as a real citation in the chat UI.
-    """
+    """Convert a PubMed record into a MediQuery JSONL record."""
     text = f"{rec['title']}. {rec['abstract']}"
 
-    # Citation string shown in chat UI sources panel
     citation_parts = []
     if rec["authors"]:
         citation_parts.append(rec["authors"])
@@ -225,8 +193,6 @@ def build_record(rec: dict, topic_label: str) -> dict:
     }
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-
 def main(out_path: str) -> None:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -244,11 +210,10 @@ def main(out_path: str) -> None:
                 logger.info("Searching: %-30s (up to %d results)", label, max_results)
 
                 pmids = search_pmids(query, max_results, client)
-                # Filter already-seen PMIDs (dedup across topics)
                 new_pmids = [p for p in pmids if p not in seen_pmids]
 
                 if not new_pmids:
-                    logger.info("  → No new results")
+                    logger.info("  -> No new results")
                     continue
 
                 records = fetch_abstracts(new_pmids, client)
@@ -263,10 +228,9 @@ def main(out_path: str) -> None:
                     written += 1
                     total_written += 1
 
-                logger.info("  → Wrote %d abstracts", written)
+                logger.info("  -> Wrote %d abstracts", written)
 
-                # Respect PubMed rate limit: 3 requests/sec without API key
-                # We make 2 requests per topic so wait 0.8s to be safe
+                # PubMed rate limit: 3 requests/sec without API key
                 time.sleep(0.8)
 
             except httpx.HTTPError as e:
@@ -279,7 +243,7 @@ def main(out_path: str) -> None:
 
     logger.info("")
     logger.info("=" * 60)
-    logger.info("✅ PubMed fetch complete!")
+    logger.info("PubMed fetch complete.")
     logger.info("   Total abstracts written : %d", total_written)
     logger.info("   Unique PMIDs            : %d", len(seen_pmids))
     logger.info("   Output file             : %s", out)

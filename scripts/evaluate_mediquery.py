@@ -1,22 +1,8 @@
-"""
-scripts/evaluate_mediquery.py
-End-to-end quality evaluation for MediQuery.
-
-Metrics (per question):
-  keyword_recall      — fraction of expected medical terms present in the answer
-  gt_overlap          — content-word overlap between answer and reference answer
-  source_supported    — fraction of answer words found in retrieved source passages
-  semantic_similarity — cosine similarity of answer↔ground-truth embeddings
-                        (requires HF_API_TOKEN; skip with --no-semantic)
+"""scripts/evaluate_mediquery.py — End-to-end quality evaluation for MediQuery.
 
 Usage:
-  # Full run (all 25 questions, detailed mode, semantic similarity on):
   python scripts/evaluate_mediquery.py
-
-  # Against staging, brief mode, skip semantic calls:
   python scripts/evaluate_mediquery.py --url https://staging.example.com --mode short --no-semantic
-
-  # Cardio + diabetes only:
   python scripts/evaluate_mediquery.py --categories cardiovascular diabetes
 """
 from __future__ import annotations
@@ -36,8 +22,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────────────
-
 DEFAULT_URL = os.getenv("MEDIQUERY_URL", "http://localhost:8000")
 HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
 HF_EMBEDDING_MODEL = os.getenv(
@@ -52,10 +36,8 @@ TIMEOUT = 90
 REQUEST_DELAY_SECONDS = 4
 RETRIES = 3
 
-# ── Test cases (25 questions across 11 medical categories) ────────────────────
-
 TEST_CASES = [
-    # ── Cardiovascular ────────────────────────────────────────────────────────
+    # cardiovascular
     {
         "category": "cardiovascular",
         "question": "my doctor said i have high blood pressure, what does that actually mean and why is it bad?",
@@ -80,7 +62,7 @@ TEST_CASES = [
         "ground_truth": "Heart attack risk factors include high blood pressure, high cholesterol, smoking, diabetes, obesity, family history, and physical inactivity. A doctor can assess personal risk.",
         "keywords": ["heart attack", "risk", "blood pressure", "cholesterol", "smoking", "family history", "diabetes"],
     },
-    # ── Diabetes ──────────────────────────────────────────────────────────────
+    # diabetes
     {
         "category": "diabetes",
         "question": "im always thirsty and peeing a lot, could that be diabetes",
@@ -99,7 +81,7 @@ TEST_CASES = [
         "ground_truth": "Type 1 diabetes is autoimmune where the body destroys insulin-producing beta cells. Type 2 is where cells become resistant to insulin, often linked to obesity and lifestyle.",
         "keywords": ["type 1", "type 2", "autoimmune", "insulin", "resistant", "beta cells"],
     },
-    # ── Respiratory ───────────────────────────────────────────────────────────
+    # respiratory
     {
         "category": "respiratory",
         "question": "i get really short of breath when i exercise, could it be asthma",
@@ -112,14 +94,14 @@ TEST_CASES = [
         "ground_truth": "Smoking causes chronic inflammation, destroys air sacs reducing lung capacity, leads to COPD and emphysema, paralyses cilia so mucus builds up, and significantly raises lung cancer risk.",
         "keywords": ["smoking", "lungs", "inflammation", "air sacs", "COPD", "emphysema", "lung cancer", "cilia"],
     },
-    # ── Infectious ────────────────────────────────────────────────────────────
+    # infectious
     {
         "category": "infectious",
         "question": "whats the difference between a cold and the flu",
         "ground_truth": "Colds have gradual onset and mainly affect the nose and throat. Flu has sudden onset with fever, body aches, and fatigue and can cause serious complications.",
         "keywords": ["cold", "flu", "fever", "body aches", "fatigue", "gradual", "sudden"],
     },
-    # ── Musculoskeletal ───────────────────────────────────────────────────────
+    # musculoskeletal
     {
         "category": "musculoskeletal",
         "question": "my joints are always swollen and painful in the morning, what could cause that",
@@ -132,7 +114,7 @@ TEST_CASES = [
         "ground_truth": "Osteoarthritis is mechanical wear-and-tear joint damage. Rheumatoid arthritis is autoimmune where the immune system attacks the joint lining causing systemic inflammation.",
         "keywords": ["osteoarthritis", "rheumatoid arthritis", "wear-and-tear", "autoimmune", "joint lining", "inflammation"],
     },
-    # ── Metabolic ─────────────────────────────────────────────────────────────
+    # metabolic
     {
         "category": "metabolic",
         "question": "besides looking overweight, what are the actual health problems obesity causes",
@@ -145,7 +127,7 @@ TEST_CASES = [
         "ground_truth": "BMI is body mass index calculated from height and weight. It is a screening tool but has limitations as it does not account for muscle mass or fat distribution.",
         "keywords": ["BMI", "body mass index", "height", "weight", "screening tool", "muscle mass", "fat distribution"],
     },
-    # ── Immunology ────────────────────────────────────────────────────────────
+    # immunology
     {
         "category": "immunology",
         "question": "how does my immune system actually fight off an infection",
@@ -164,7 +146,7 @@ TEST_CASES = [
         "ground_truth": "Autoimmune diseases occur when the immune system mistakenly attacks healthy cells. The cause involves a mix of genetic predisposition and environmental triggers.",
         "keywords": ["autoimmune", "immune system", "healthy cells", "genetic", "environmental triggers", "attacks itself"],
     },
-    # ── Mental health ─────────────────────────────────────────────────────────
+    # mental health
     {
         "category": "mental_health",
         "question": "whats the difference between feeling sad and actually having depression",
@@ -177,14 +159,14 @@ TEST_CASES = [
         "ground_truth": "Chronic stress raises cortisol levels which suppresses immune function, raises blood pressure, disrupts sleep, and increases risk of cardiovascular disease.",
         "keywords": ["stress", "cortisol", "immune function", "blood pressure", "sleep", "cardiovascular disease", "chronic"],
     },
-    # ── Nutrition ─────────────────────────────────────────────────────────────
+    # nutrition
     {
         "category": "nutrition",
         "question": "why is too much salt bad for you",
         "ground_truth": "Excess sodium causes the body to retain water, raising blood volume and blood pressure, which strains the heart and arteries and increases risk of hypertension.",
         "keywords": ["salt", "sodium", "retain water", "blood volume", "blood pressure", "heart", "hypertension"],
     },
-    # ── Organ function ────────────────────────────────────────────────────────
+    # organ function
     {
         "category": "organ_function",
         "question": "what does the liver actually do",
@@ -197,21 +179,21 @@ TEST_CASES = [
         "ground_truth": "Kidneys filter waste from blood, regulate fluid balance, and control blood pressure. Signs of dysfunction include swelling, fatigue, changes in urination, and back pain.",
         "keywords": ["kidneys", "filter waste", "fluid balance", "blood pressure", "swelling", "fatigue", "urination"],
     },
-    # ── Oncology ──────────────────────────────────────────────────────────────
+    # oncology
     {
         "category": "oncology",
         "question": "what are the general warning signs that could indicate cancer",
         "ground_truth": "General cancer warning signs include unexplained weight loss, persistent fatigue, unusual lumps, changes in bowel habits, persistent cough, and unexplained bleeding.",
         "keywords": ["cancer", "weight loss", "fatigue", "lumps", "bowel habits", "cough", "bleeding"],
     },
-    # ── Endocrine ─────────────────────────────────────────────────────────────
+    # endocrine
     {
         "category": "endocrine",
         "question": "ive been gaining weight and feeling tired all the time, could it be my thyroid",
         "ground_truth": "Hypothyroidism occurs when the thyroid produces too little hormone, causing weight gain, fatigue, cold intolerance, and depression.",
         "keywords": ["thyroid", "hypothyroidism", "weight gain", "fatigue", "hormone", "cold intolerance", "depression"],
     },
-    # ── Lifestyle ─────────────────────────────────────────────────────────────
+    # lifestyle
     {
         "category": "lifestyle",
         "question": "why is sleep so important for your health",
@@ -222,7 +204,6 @@ TEST_CASES = [
 
 ALL_CATEGORIES: list[str] = sorted({c["category"] for c in TEST_CASES})
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _normalize(text: str) -> list[str]:
     return [
@@ -238,8 +219,6 @@ def _cosine(a: list[float], b: list[float]) -> float:
     mag_b = math.sqrt(sum(x * x for x in b))
     return dot / (mag_a * mag_b) if mag_a and mag_b else 0.0
 
-
-# ── Scoring ───────────────────────────────────────────────────────────────────
 
 def score_keyword_recall(answer: str, keywords: list[str]) -> float:
     lower = answer.lower()
@@ -270,13 +249,7 @@ def score_source_supported(answer: str, sources: list[dict]) -> float:
 
 
 def score_semantic_similarity(answer: str, ground_truth: str) -> float | None:
-    """
-    Embed both texts with the same HF model used in production and compute
-    cosine similarity.  This captures paraphrasing and medical synonyms that
-    word-overlap metrics completely miss — a far more meaningful quality signal.
-
-    Returns None if HF_API_TOKEN is not set or the call fails.
-    """
+    """Cosine similarity of answer vs ground-truth embeddings. Returns None if unavailable."""
     if not HF_API_TOKEN:
         return None
     headers = {
@@ -300,8 +273,6 @@ def score_semantic_similarity(answer: str, ground_truth: str) -> float | None:
     return None
 
 
-# ── API call ──────────────────────────────────────────────────────────────────
-
 def query_mediquery(question: str, endpoint: str, mode: str = "detailed") -> dict:
     for attempt in range(RETRIES):
         try:
@@ -319,8 +290,6 @@ def query_mediquery(question: str, endpoint: str, mode: str = "detailed") -> dic
             print(f"  retry {attempt + 2}/{RETRIES} in {delay:.1f}s...", end=" ")
             time.sleep(delay)
 
-
-# ── Grading ───────────────────────────────────────────────────────────────────
 
 def grade(score: float) -> str:
     if score >= 0.80:
@@ -342,8 +311,6 @@ def _overall(scores: dict) -> float:
         vals.append(scores["semantic_similarity"])
     return round(statistics.mean(vals), 3)
 
-
-# ── Pretty printing ───────────────────────────────────────────────────────────
 
 def _pct(v: float) -> str:
     return f"{v * 100:5.1f}%"
@@ -433,8 +400,6 @@ def print_worst(results: list[dict], n: int = 5) -> None:
         print()
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-
 def run_evaluation(
     base_url: str,
     out_path: str | None,
@@ -516,7 +481,6 @@ def run_evaluation(
     print_category_breakdown(valid)
     print_worst(valid)
 
-    # ── Persist results ───────────────────────────────────────────────────────
     kw  = [r["scores"]["keyword_recall"] for r in valid]
     gt  = [r["scores"]["ground_truth_overlap"] for r in valid]
     src = [r["scores"]["source_supported"] for r in valid]
@@ -550,7 +514,7 @@ def run_evaluation(
 
     fname = out_path or f"mediquery_eval_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     Path(fname).write_text(json.dumps(output, indent=2))
-    print(f"\n  Results saved → {fname}")
+    print(f"\n  Results saved -> {fname}")
     print("\nDone.")
 
 

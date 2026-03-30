@@ -1,17 +1,12 @@
 # MediQuery Makefile
-# Usage: make <target>
 
 .PHONY: run dev test eval ingest lint fmt help
-
-# ── Server ─────────────────────────────────────────────────────────────────────
 
 run:
 	uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 dev:
 	uvicorn app.main:app --reload --port 8000
-
-# ── Tests ──────────────────────────────────────────────────────────────────────
 
 test:
 	pytest tests/ -v
@@ -22,8 +17,6 @@ test-safety:
 test-scoring:
 	pytest tests/test_scoring.py -v
 
-# ── Evaluation ─────────────────────────────────────────────────────────────────
-
 eval:
 	python scripts/evaluate_mediquery.py
 
@@ -32,8 +25,6 @@ eval-brief:
 
 eval-save:
 	python scripts/evaluate_mediquery.py --out eval_results.json
-
-# ── Ingestion ──────────────────────────────────────────────────────────────────
 
 ingest:
 	python scripts/ingest.py
@@ -45,8 +36,6 @@ ingest-pdf:
 	fi
 	python scripts/ingest_pdf.py "$(PDF)" $(if $(OUT),"$(OUT)",data/chunks.jsonl)
 
-# ── Code quality ───────────────────────────────────────────────────────────────
-
 lint:
 	@command -v ruff >/dev/null 2>&1 && ruff check app/ scripts/ tests/ || \
 		echo "ruff not installed — run: pip install ruff"
@@ -54,8 +43,6 @@ lint:
 fmt:
 	@command -v ruff >/dev/null 2>&1 && ruff format app/ scripts/ tests/ || \
 		echo "ruff not installed — run: pip install ruff"
-
-# ── Help ───────────────────────────────────────────────────────────────────────
 
 help:
 	@echo ""
