@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
+import time
 from functools import lru_cache
 from typing import Any, AsyncIterator
 
@@ -11,17 +13,24 @@ from pinecone import Pinecone
 
 from app.circuit_breaker import CircuitBreaker
 from app.config import Settings
+from app.metrics import metrics
 
 logger = logging.getLogger(__name__)
 
 MIN_SCORE = 0.35
 RERANKER_TOP_N = 3
+MAX_CONTEXT_CHARS = 12_000
 
 _embed_breaker = CircuitBreaker("embedding", failure_threshold=5, recovery_timeout=60.0)
 _generate_breaker = CircuitBreaker("generation", failure_threshold=5, recovery_timeout=60.0)
 _rerank_breaker = CircuitBreaker("reranker", failure_threshold=5, recovery_timeout=60.0)
 
 _TRANSIENT_ERRORS = (httpx.TimeoutException, httpx.ConnectError)
+
+# In-memory embedding cache: key → (vector, monotonic timestamp)
+_EMBED_CACHE: dict[str, tuple[list[float], float]] = {}
+_CACHE_MAX = 256
+_CACHE_TTL = 300.0
 
 SYSTEM_PROMPT = """You are MediQuery, a warm, knowledgeable medical information assistant with the bedside manner of a trusted doctor friend.
 
@@ -48,12 +57,29 @@ _MODE_INSTRUCTIONS: dict[str, str] = {
     ),
 }
 
-USER_TEMPLATE = """Medical knowledge:
-{context}
 
-Patient question: {question}
+def _build_user_prompt(context: str, question: str, instruction: str) -> str:
+    return f"Medical knowledge:\n{context}\n\nPatient question: {question}\n\n{instruction}"
 
-{instruction}"""
+
+def _embed_cache_key(text: str, model: str) -> str:
+    return hashlib.sha256(f"{model}:{text}".encode()).hexdigest()[:16]
+
+
+def _cache_lookup(text: str, model: str) -> list[float] | None:
+    key = _embed_cache_key(text, model)
+    entry = _EMBED_CACHE.get(key)
+    if entry and time.monotonic() - entry[1] < _CACHE_TTL:
+        return entry[0]
+    _EMBED_CACHE.pop(key, None)
+    return None
+
+
+def _cache_store(text: str, model: str, embedding: list[float]) -> None:
+    key = _embed_cache_key(text, model)
+    if len(_EMBED_CACHE) >= _CACHE_MAX:
+        del _EMBED_CACHE[next(iter(_EMBED_CACHE))]
+    _EMBED_CACHE[key] = (embedding, time.monotonic())
 
 
 async def _do_embed(text: str, settings: Settings) -> list[float]:
@@ -91,7 +117,16 @@ async def _do_embed(text: str, settings: Settings) -> list[float]:
 
 
 async def embed_query(text: str, settings: Settings) -> list[float]:
-    return await _embed_breaker.call(_do_embed(text, settings))
+    cached = _cache_lookup(text, settings.hf_embedding_model)
+    if cached is not None:
+        metrics.record_cache_hit()
+        logger.debug("Embedding cache hit")
+        return cached
+
+    metrics.record_cache_miss()
+    embedding = await _embed_breaker.call(_do_embed(text, settings))
+    _cache_store(text, settings.hf_embedding_model, embedding)
+    return embedding
 
 
 @lru_cache(maxsize=1)
@@ -272,6 +307,14 @@ def get_circuit_breaker_states() -> dict[str, str]:
     }
 
 
+def _build_context(chunks: list[dict]) -> str:
+    context = "\n\n---\n\n".join(chunk["text"] for chunk in chunks)
+    if len(context) > MAX_CONTEXT_CHARS:
+        logger.warning("Context truncated from %d to %d chars", len(context), MAX_CONTEXT_CHARS)
+        context = context[:MAX_CONTEXT_CHARS]
+    return context
+
+
 async def run_rag(
     question: str,
     settings: Settings,
@@ -279,6 +322,7 @@ async def run_rag(
     mode: str = "detailed",
 ) -> dict[str, Any]:
     logger.info("RAG query received (length=%d)", len(question))
+    t0 = time.perf_counter()
 
     retrieval_q = _retrieval_query(question, history)
     query_vector = await embed_query(retrieval_q, settings)
@@ -296,14 +340,13 @@ async def run_rag(
         }
 
     chunks = await rerank(question, chunks, settings)
-
-    context_text = "\n\n---\n\n".join(chunk["text"] for chunk in chunks)
+    context = _build_context(chunks)
     instruction = _MODE_INSTRUCTIONS.get(mode, _MODE_INSTRUCTIONS["detailed"])
-    user_prompt = USER_TEMPLATE.format(
-        context=context_text, question=question, instruction=instruction
-    )
-
+    user_prompt = _build_user_prompt(context, question, instruction)
     answer = await generate(user_prompt, settings, history=history)
+
+    latency_ms = (time.perf_counter() - t0) * 1000
+    metrics.record_request(latency_ms)
 
     sources = [
         {"source": chunk["source"], "score": chunk["score"], "text": chunk["text"]}
@@ -320,6 +363,7 @@ async def run_rag_stream(
     mode: str = "detailed",
 ) -> AsyncIterator[str]:
     logger.info("RAG stream query received (length=%d)", len(question))
+    t0 = time.perf_counter()
 
     try:
         retrieval_q = _retrieval_query(question, history)
@@ -335,32 +379,33 @@ async def run_rag_stream(
             )
             yield f"data: {json.dumps({'type': 'token', 'content': no_info})}\n\n"
             yield f"data: {json.dumps({'type': 'done', 'sources': []})}\n\n"
+            metrics.record_request((time.perf_counter() - t0) * 1000)
             return
 
         chunks = await rerank(question, chunks, settings)
-
         sources = [
             {"source": c["source"], "score": c["score"], "text": c["text"]}
             for c in chunks
             if c["text"]
         ]
 
-        context_text = "\n\n---\n\n".join(c["text"] for c in chunks)
+        context = _build_context(chunks)
         instruction = _MODE_INSTRUCTIONS.get(mode, _MODE_INSTRUCTIONS["detailed"])
-        user_prompt = USER_TEMPLATE.format(
-            context=context_text, question=question, instruction=instruction
-        )
+        user_prompt = _build_user_prompt(context, question, instruction)
 
         async for token in generate_stream(user_prompt, settings, history=history):
             yield f"data: {json.dumps({'type': 'token', 'content': token})}\n\n"
 
         yield f"data: {json.dumps({'type': 'done', 'sources': sources})}\n\n"
+        metrics.record_request((time.perf_counter() - t0) * 1000)
 
     except RuntimeError as exc:
         logger.error("RAG stream pipeline error: %s", exc)
+        metrics.record_request((time.perf_counter() - t0) * 1000, error=True)
         yield f"data: {json.dumps({'type': 'error', 'content': 'The AI service is temporarily unavailable. Please try again shortly.'})}\n\n"
         yield f"data: {json.dumps({'type': 'done', 'sources': []})}\n\n"
     except Exception:
         logger.exception("Unexpected error in RAG stream pipeline")
+        metrics.record_request((time.perf_counter() - t0) * 1000, error=True)
         yield f"data: {json.dumps({'type': 'error', 'content': 'An unexpected error occurred.'})}\n\n"
         yield f"data: {json.dumps({'type': 'done', 'sources': []})}\n\n"

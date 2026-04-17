@@ -758,7 +758,7 @@ async function sendMessage() {
   showTyping();
 
   const allMsgs = chats[activeChatId].messages;
-  const history = allMsgs.slice(-9, -1).map(m => ({
+  const history = allMsgs.slice(-7, -1).map(m => ({
     role: m.role === 'bot' ? 'assistant' : m.role,
     content: m.content,
   }));

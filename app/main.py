@@ -1,8 +1,11 @@
+import asyncio
+import json
 import logging
 import os
 import re
 import time
 import unicodedata
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List, Literal, Optional
 
@@ -13,19 +16,44 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, field_validator
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from app.config import get_settings
+from app.metrics import metrics
 from app.middleware import RequestIDFilter, request_id_middleware
-from app.rag import get_circuit_breaker_states, run_rag, run_rag_stream
+from app.rag import _get_pinecone_index, get_circuit_breaker_states, run_rag, run_rag_stream
 from app.safety import check as safety_check
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | req=%(request_id)s | %(message)s",
+
+def _get_client_ip(request: Request) -> str:
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+class _JSONFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        log: dict = {
+            "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
+            "level": record.levelname,
+            "logger": record.name,
+            "req": getattr(record, "request_id", "-"),
+            "msg": record.getMessage(),
+        }
+        if record.exc_info:
+            log["exc"] = self.formatException(record.exc_info)
+        return json.dumps(log)
+
+
+_use_json_logs = os.getenv("LOG_FORMAT", "json").lower() != "text"
+_formatter = _JSONFormatter() if _use_json_logs else logging.Formatter(
+    "%(asctime)s | %(levelname)s | %(name)s | req=%(request_id)s | %(message)s"
 )
 _request_id_filter = RequestIDFilter()
+
+logging.basicConfig(level=logging.INFO)
 for _handler in logging.root.handlers:
+    _handler.setFormatter(_formatter)
     _handler.addFilter(_request_id_filter)
 
 logger = logging.getLogger("mediquery")
@@ -33,7 +61,21 @@ logger = logging.getLogger("mediquery")
 BASE_DIR = Path(__file__).resolve().parent.parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=_get_client_ip)
+
+settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    logger.info("MediQuery started. Pinecone index: %s", settings.pinecone_index_name)
+    try:
+        await asyncio.to_thread(_get_pinecone_index, settings.pinecone_api_key, settings.pinecone_host)
+        logger.info("Pinecone connection warmed up")
+    except Exception as exc:
+        logger.warning("Pinecone warmup failed (will retry on first request): %s", exc)
+    yield
+
 
 app = FastAPI(
     title="MediQuery",
@@ -41,6 +83,7 @@ app = FastAPI(
     version="3.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.state.limiter = limiter
@@ -56,9 +99,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "X-Request-ID"],
 )
-
-settings = get_settings()
-logger.info("MediQuery started. Pinecone index: %s", settings.pinecone_index_name)
 
 
 @app.middleware("http")
@@ -180,6 +220,14 @@ async def health_ready(request: Request):
     )
 
 
+@app.get("/metrics")
+@limiter.limit("30/minute")
+async def get_metrics(request: Request):
+    return JSONResponse(
+        content={**metrics.summary(), "circuit_breakers": get_circuit_breaker_states()}
+    )
+
+
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("10/minute")
 async def chat(request: Request, body: ChatRequest):
@@ -200,12 +248,14 @@ async def chat(request: Request, body: ChatRequest):
         result = await run_rag(message, settings, history=history, mode=body.mode)
     except RuntimeError as e:
         logger.error("RAG pipeline error: %s", e)
+        metrics.record_request((time.perf_counter() - t0) * 1000, error=True)
         raise HTTPException(
             status_code=503,
             detail="The AI service is temporarily unavailable. Please try again shortly.",
         ) from e
     except Exception:
         logger.exception("Unexpected error in RAG pipeline")
+        metrics.record_request((time.perf_counter() - t0) * 1000, error=True)
         raise HTTPException(status_code=500, detail="Internal server error.")
 
     elapsed = round(time.perf_counter() - t0, 2)

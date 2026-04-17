@@ -148,3 +148,15 @@ async def test_chat_control_characters_rejected(client):
     async with client as c:
         r = await c.post("/chat", json={"message": "What is aspirin?\x00"})
     assert r.status_code == 422
+
+
+async def test_metrics_endpoint(client):
+    async with client as c:
+        r = await c.get("/metrics")
+    assert r.status_code == 200
+    data = r.json()
+    assert "requests" in data
+    assert "latency_ms" in data
+    assert "embedding_cache" in data
+    assert "circuit_breakers" in data
+    assert "uptime_seconds" in data
