@@ -16,6 +16,8 @@ exec gunicorn app.main:app \
     --workers "${WORKERS}" \
     --worker-class uvicorn.workers.UvicornWorker \
     --timeout 120 \
+    --graceful-timeout 30 \
+    --keep-alive 5 \
     --access-logfile - \
     --error-logfile - \
     --log-level info

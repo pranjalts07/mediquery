@@ -9,12 +9,19 @@ from typing import Any, AsyncIterator
 import httpx
 from pinecone import Pinecone
 
+from app.circuit_breaker import CircuitBreaker
 from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
 MIN_SCORE = 0.35
 RERANKER_TOP_N = 3
+
+_embed_breaker = CircuitBreaker("embedding", failure_threshold=5, recovery_timeout=60.0)
+_generate_breaker = CircuitBreaker("generation", failure_threshold=5, recovery_timeout=60.0)
+_rerank_breaker = CircuitBreaker("reranker", failure_threshold=5, recovery_timeout=60.0)
+
+_TRANSIENT_ERRORS = (httpx.TimeoutException, httpx.ConnectError)
 
 SYSTEM_PROMPT = """You are MediQuery, a warm, knowledgeable medical information assistant with the bedside manner of a trusted doctor friend.
 
@@ -49,7 +56,7 @@ Patient question: {question}
 {instruction}"""
 
 
-async def embed_query(text: str, settings: Settings) -> list[float]:
+async def _do_embed(text: str, settings: Settings) -> list[float]:
     url = f"https://router.huggingface.co/hf-inference/models/{settings.hf_embedding_model}/pipeline/feature-extraction"
     headers = {
         "Authorization": f"Bearer {settings.hf_api_token}",
@@ -57,8 +64,19 @@ async def embed_query(text: str, settings: Settings) -> list[float]:
     }
     payload = {"inputs": text, "options": {"wait_for_model": True}}
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.post(url, json=payload, headers=headers)
+    last_exc: Exception | None = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                resp = await client.post(url, json=payload, headers=headers)
+            break
+        except _TRANSIENT_ERRORS as exc:
+            last_exc = exc
+            if attempt < 2:
+                logger.warning("Embedding timeout (attempt %d/3), retrying...", attempt + 1)
+                await asyncio.sleep(2**attempt)
+    else:
+        raise RuntimeError("Embedding service unavailable after 3 attempts.") from last_exc
 
     if resp.status_code != 200:
         logger.error("HF embedding API error: status=%s", resp.status_code)
@@ -72,6 +90,10 @@ async def embed_query(text: str, settings: Settings) -> list[float]:
     raise ValueError(f"Unexpected embedding response shape: {type(result)}")
 
 
+async def embed_query(text: str, settings: Settings) -> list[float]:
+    return await _embed_breaker.call(_do_embed(text, settings))
+
+
 @lru_cache(maxsize=1)
 def _get_pinecone_index(api_key: str, host: str):
     pc = Pinecone(api_key=api_key)
@@ -80,7 +102,6 @@ def _get_pinecone_index(api_key: str, host: str):
 
 async def retrieve(query_vector: list[float], settings: Settings) -> list[dict[str, Any]]:
     index = _get_pinecone_index(settings.pinecone_api_key, settings.pinecone_host)
-    # Pinecone client is synchronous — run in a thread so we don't block the event loop.
     response = await asyncio.to_thread(
         index.query,
         vector=query_vector,
@@ -113,18 +134,15 @@ async def rerank(question: str, chunks: list[dict], settings: Settings) -> list[
     }
     payload = {"inputs": [[question, chunk["text"]] for chunk in chunks]}
 
-    try:
+    async def _do_rerank() -> list[dict]:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(url, json=payload, headers=headers)
 
         if resp.status_code != 200:
-            logger.warning(
-                "Reranker API error %s — using original Pinecone order", resp.status_code
-            )
+            logger.warning("Reranker API error %s — using original Pinecone order", resp.status_code)
             return chunks[:RERANKER_TOP_N]
 
         raw = resp.json()
-
         if raw and isinstance(raw[0], (int, float)):
             scores = [float(s) for s in raw]
         elif raw and isinstance(raw[0], list):
@@ -138,6 +156,8 @@ async def rerank(question: str, chunks: list[dict], settings: Settings) -> list[
         logger.info("Reranker: %d → %d chunks", len(chunks), len(reranked))
         return reranked
 
+    try:
+        return await _rerank_breaker.call(_do_rerank())
     except Exception as exc:
         logger.warning("Reranker failed (%s) — using original Pinecone order", exc)
         return chunks[:RERANKER_TOP_N]
@@ -153,7 +173,7 @@ def _build_messages(prompt: str, history: list[dict] | None) -> list[dict]:
     return messages
 
 
-async def generate(prompt: str, settings: Settings, history: list[dict] | None = None) -> str:
+async def _do_generate(prompt: str, settings: Settings, history: list[dict] | None) -> str:
     url = "https://router.huggingface.co/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {settings.hf_api_token}",
@@ -167,8 +187,19 @@ async def generate(prompt: str, settings: Settings, history: list[dict] | None =
         "stream":      False,
     }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        resp = await client.post(url, json=payload, headers=headers)
+    last_exc: Exception | None = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(url, json=payload, headers=headers)
+            break
+        except _TRANSIENT_ERRORS as exc:
+            last_exc = exc
+            if attempt < 2:
+                logger.warning("Generation timeout (attempt %d/3), retrying...", attempt + 1)
+                await asyncio.sleep(2**attempt)
+    else:
+        raise RuntimeError("Generation service unavailable after 3 attempts.") from last_exc
 
     if resp.status_code != 200:
         logger.error("HF generation API error: status=%s", resp.status_code)
@@ -179,6 +210,10 @@ async def generate(prompt: str, settings: Settings, history: list[dict] | None =
         return data["choices"][0]["message"]["content"].strip()
     except (KeyError, IndexError) as exc:
         raise ValueError(f"Unexpected generation response structure: {data}") from exc
+
+
+async def generate(prompt: str, settings: Settings, history: list[dict] | None = None) -> str:
+    return await _generate_breaker.call(_do_generate(prompt, settings, history))
 
 
 async def generate_stream(
@@ -227,6 +262,14 @@ def _retrieval_query(question: str, history: list[dict] | None) -> str:
         if last_user:
             return f"{last_user} — {question}"
     return question
+
+
+def get_circuit_breaker_states() -> dict[str, str]:
+    return {
+        "embedding":  _embed_breaker.state_name,
+        "generation": _generate_breaker.state_name,
+        "reranker":   _rerank_breaker.state_name,
+    }
 
 
 async def run_rag(

@@ -26,6 +26,7 @@ _MEDICAL_EMERGENCY_TERMS: frozenset[str] = frozenset({
     "not breathing",
     "stopped breathing",
     "cant breathe",
+    "can't breathe",
     "unconscious",
     "passed out",
     "chest pain",

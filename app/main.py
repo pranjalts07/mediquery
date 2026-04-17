@@ -16,13 +16,18 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.config import get_settings
-from app.rag import run_rag, run_rag_stream
+from app.middleware import RequestIDFilter, request_id_middleware
+from app.rag import get_circuit_breaker_states, run_rag, run_rag_stream
 from app.safety import check as safety_check
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    format="%(asctime)s | %(levelname)s | %(name)s | req=%(request_id)s | %(message)s",
 )
+_request_id_filter = RequestIDFilter()
+for _handler in logging.root.handlers:
+    _handler.addFilter(_request_id_filter)
+
 logger = logging.getLogger("mediquery")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +38,7 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(
     title="MediQuery",
     description="Medical RAG chatbot powered by Pinecone vector retrieval and HuggingFace LLM inference.",
-    version="3.0.0",
+    version="3.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -49,11 +54,16 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "X-Request-ID"],
 )
 
 settings = get_settings()
 logger.info("MediQuery started. Pinecone index: %s", settings.pinecone_index_name)
+
+
+@app.middleware("http")
+async def add_request_id(request: Request, call_next):
+    return await request_id_middleware(request, call_next)
 
 
 @app.middleware("http")
@@ -135,6 +145,12 @@ class HealthResponse(BaseModel):
     index: str
 
 
+class ReadinessResponse(BaseModel):
+    status: str
+    version: str
+    services: dict[str, str]
+
+
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 @limiter.limit("60/minute")
 async def index(request: Request):
@@ -146,9 +162,21 @@ async def index(request: Request):
 async def health(request: Request):
     return HealthResponse(
         status="ok",
-        version="3.0.0",
+        version="3.1.0",
         model=settings.hf_llm_model,
         index=settings.pinecone_index_name,
+    )
+
+
+@app.get("/health/ready", response_model=ReadinessResponse)
+@limiter.limit("30/minute")
+async def health_ready(request: Request):
+    states = get_circuit_breaker_states()
+    degraded = any(s != "closed" for s in states.values())
+    return ReadinessResponse(
+        status="degraded" if degraded else "ready",
+        version="3.1.0",
+        services=states,
     )
 
 

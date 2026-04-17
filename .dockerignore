@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+tests/
+notebooks/
+data/
+scripts/
+images/
+*.zip
+*.json
+.git/
+.github/
+*.md
