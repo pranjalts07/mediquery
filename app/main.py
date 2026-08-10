@@ -31,6 +31,27 @@ def _get_client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+# Global daily cap — prevents HF API quota exhaustion from distributed abuse.
+# Resets every 24 hours. Configurable via DAILY_REQUEST_LIMIT env var.
+_daily_lock = __import__("threading").Lock()
+_daily_count = 0
+_daily_reset_at = time.time() + 86400
+DAILY_LIMIT = int(os.getenv("DAILY_REQUEST_LIMIT", "1000"))
+MAX_BODY_BYTES = 32 * 1024  # 32KB — well above any valid request
+
+
+def _allow_request() -> bool:
+    global _daily_count, _daily_reset_at
+    with _daily_lock:
+        if time.time() >= _daily_reset_at:
+            _daily_count = 0
+            _daily_reset_at = time.time() + 86400
+        if _daily_count >= DAILY_LIMIT:
+            return False
+        _daily_count += 1
+        return True
+
+
 class _JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         log: dict = {
@@ -102,6 +123,14 @@ app.add_middleware(
 
 
 @app.middleware("http")
+async def limit_body_size(request: Request, call_next):
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > MAX_BODY_BYTES:
+        return JSONResponse(status_code=413, content={"error": "Request body too large."})
+    return await call_next(request)
+
+
+@app.middleware("http")
 async def add_request_id(request: Request, call_next):
     return await request_id_middleware(request, call_next)
 
@@ -165,7 +194,8 @@ class ChatRequest(BaseModel):
 
     message: str = Field(..., min_length=1, max_length=2000)
     history: Optional[List[HistoryMessage]] = Field(default=None, max_length=20)
-    mode: Literal["short", "detailed"] = Field(default="detailed")
+    mode: Literal["simple", "short", "detailed"] = Field(default="detailed")
+    patient_context: Optional[str] = Field(default=None, max_length=500)
 
     @field_validator("message")
     @classmethod
@@ -223,14 +253,23 @@ async def health_ready(request: Request):
 @app.get("/metrics")
 @limiter.limit("30/minute")
 async def get_metrics(request: Request):
-    return JSONResponse(
-        content={**metrics.summary(), "circuit_breakers": get_circuit_breaker_states()}
-    )
+    return JSONResponse(content={
+        **metrics.summary(),
+        "circuit_breakers": get_circuit_breaker_states(),
+        "daily_quota": {
+            "used": _daily_count,
+            "limit": DAILY_LIMIT,
+            "remaining": max(0, DAILY_LIMIT - _daily_count),
+        },
+    })
 
 
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("10/minute")
 async def chat(request: Request, body: ChatRequest):
+    if not _allow_request():
+        raise HTTPException(status_code=429, detail="Daily request limit reached. Try again tomorrow.")
+
     message = body.message
 
     safety_result = safety_check(message)
@@ -245,7 +284,7 @@ async def chat(request: Request, body: ChatRequest):
             if body.history
             else None
         )
-        result = await run_rag(message, settings, history=history, mode=body.mode)
+        result = await run_rag(message, settings, history=history, mode=body.mode, patient_context=body.patient_context)
     except RuntimeError as e:
         logger.error("RAG pipeline error: %s", e)
         metrics.record_request((time.perf_counter() - t0) * 1000, error=True)
@@ -267,6 +306,9 @@ async def chat(request: Request, body: ChatRequest):
 @app.post("/chat/stream", include_in_schema=False)
 @limiter.limit("10/minute")
 async def chat_stream(request: Request, body: ChatRequest):
+    if not _allow_request():
+        raise HTTPException(status_code=429, detail="Daily request limit reached. Try again tomorrow.")
+
     message = body.message
 
     safety_result = safety_check(message)
@@ -291,7 +333,7 @@ async def chat_stream(request: Request, body: ChatRequest):
     )
 
     return StreamingResponse(
-        run_rag_stream(message, settings, history=history, mode=body.mode),
+        run_rag_stream(message, settings, history=history, mode=body.mode, patient_context=body.patient_context),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

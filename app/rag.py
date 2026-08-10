@@ -17,7 +17,7 @@ from app.metrics import metrics
 
 logger = logging.getLogger(__name__)
 
-MIN_SCORE = 0.35
+MIN_SCORE = 0.30
 RERANKER_TOP_N = 3
 MAX_CONTEXT_CHARS = 12_000
 
@@ -47,6 +47,11 @@ Your style:
 Critical rule: Base your answer strictly on the medical knowledge provided. Do not add facts, statistics, or claims that are not present in the provided knowledge."""
 
 _MODE_INSTRUCTIONS: dict[str, str] = {
+    "simple": (
+        "Explain in very plain English as if talking to someone with zero medical background. "
+        "No jargon at all — if a medical term is unavoidable, immediately explain it in brackets. "
+        "Use short sentences and everyday analogies. Keep it warm and reassuring."
+    ),
     "short": (
         "Respond in 2-3 sentences maximum. Give the essential point only. "
         "Do not elaborate, do not add caveats, do not add follow-up suggestions. Stop after the key fact."
@@ -58,8 +63,9 @@ _MODE_INSTRUCTIONS: dict[str, str] = {
 }
 
 
-def _build_user_prompt(context: str, question: str, instruction: str) -> str:
-    return f"Medical knowledge:\n{context}\n\nPatient question: {question}\n\n{instruction}"
+def _build_user_prompt(context: str, question: str, instruction: str, patient_context: str | None = None) -> str:
+    ctx_line = f"Patient context: {patient_context}\n\n" if patient_context else ""
+    return f"Medical knowledge:\n{context}\n\n{ctx_line}Patient question: {question}\n\n{instruction}"
 
 
 def _embed_cache_key(text: str, model: str) -> str:
@@ -320,6 +326,7 @@ async def run_rag(
     settings: Settings,
     history: list[dict] | None = None,
     mode: str = "detailed",
+    patient_context: str | None = None,
 ) -> dict[str, Any]:
     logger.info("RAG query received (length=%d)", len(question))
     t0 = time.perf_counter()
@@ -342,7 +349,7 @@ async def run_rag(
     chunks = await rerank(question, chunks, settings)
     context = _build_context(chunks)
     instruction = _MODE_INSTRUCTIONS.get(mode, _MODE_INSTRUCTIONS["detailed"])
-    user_prompt = _build_user_prompt(context, question, instruction)
+    user_prompt = _build_user_prompt(context, question, instruction, patient_context)
     answer = await generate(user_prompt, settings, history=history)
 
     latency_ms = (time.perf_counter() - t0) * 1000
@@ -361,6 +368,7 @@ async def run_rag_stream(
     settings: Settings,
     history: list[dict] | None = None,
     mode: str = "detailed",
+    patient_context: str | None = None,
 ) -> AsyncIterator[str]:
     logger.info("RAG stream query received (length=%d)", len(question))
     t0 = time.perf_counter()
@@ -391,7 +399,7 @@ async def run_rag_stream(
 
         context = _build_context(chunks)
         instruction = _MODE_INSTRUCTIONS.get(mode, _MODE_INSTRUCTIONS["detailed"])
-        user_prompt = _build_user_prompt(context, question, instruction)
+        user_prompt = _build_user_prompt(context, question, instruction, patient_context)
 
         async for token in generate_stream(user_prompt, settings, history=history):
             yield f"data: {json.dumps({'type': 'token', 'content': token})}\n\n"

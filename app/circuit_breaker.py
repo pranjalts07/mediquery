@@ -51,6 +51,7 @@ class CircuitBreaker:
         async with self._lock:
             current = self.state
             if current is _State.OPEN:
+                coro.close()
                 raise RuntimeError(
                     f"Service '{self.name}' is temporarily unavailable. Please try again shortly."
                 )

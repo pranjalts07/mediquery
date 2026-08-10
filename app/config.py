@@ -63,6 +63,6 @@ def get_settings() -> Settings:
         pinecone_api_key=_require("PINECONE_API_KEY"),
         pinecone_index_name=_require("PINECONE_INDEX_NAME"),
         pinecone_host=_require("PINECONE_HOST"),
-        top_k=int(os.getenv("TOP_K", "8")),
+        top_k=int(os.getenv("TOP_K", "20")),
         max_new_tokens=int(os.getenv("MAX_NEW_TOKENS", "512")),
     )

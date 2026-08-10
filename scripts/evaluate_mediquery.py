@@ -13,6 +13,17 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 
+try:
+    from datasets import Dataset
+    from ragas import evaluate as ragas_evaluate
+    from ragas.metrics import answer_relevancy, context_precision, faithfulness
+    from ragas.llms import LangchainLLMWrapper
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings
+    _RAGAS_AVAILABLE = True
+except ImportError:
+    _RAGAS_AVAILABLE = False
+
 load_dotenv()
 
 DEFAULT_URL = os.getenv("MEDIQUERY_URL", "http://localhost:8000")
@@ -393,12 +404,88 @@ def print_worst(results: list[dict], n: int = 5) -> None:
         print()
 
 
+def run_ragas_eval(results: list[dict], hf_token: str) -> dict | None:
+    import nest_asyncio
+    nest_asyncio.apply()
+
+    if not _RAGAS_AVAILABLE:
+        print("\n  [RAGAS] Not installed. Run: pip install ragas langchain-huggingface datasets")
+        return None
+    if not hf_token:
+        print("\n  [RAGAS] HF_API_TOKEN not set — cannot run RAGAS eval.")
+        return None
+
+    print("\n  Running RAGAS evaluation (this takes 3–5 minutes)...")
+
+    from langchain_openai import ChatOpenAI
+    from langchain_huggingface import HuggingFaceEmbeddings
+
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not openai_key:
+        print("\n  [RAGAS] OPENAI_API_KEY not set — cannot run RAGAS eval.")
+        return None
+
+    judge_llm = LangchainLLMWrapper(
+        ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0.0,
+            max_tokens=512,
+            api_key=openai_key,
+        )
+    )
+    embeddings = LangchainEmbeddingsWrapper(
+        HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    )
+
+    from datasets import Features, Sequence, Value
+
+    data = {
+        "question":    [r["question"] for r in results],
+        "answer":      [r["answer"] for r in results],
+        "contexts":    [
+            [s.get("text", "") for s in r.get("sources", []) if s.get("text")]
+            for r in results
+        ],
+        "ground_truth": [r["ground_truth"] for r in results],
+    }
+    features = Features({
+        "question":     Value("string"),
+        "answer":       Value("string"),
+        "contexts":     Sequence(Value("string")),
+        "ground_truth": Value("string"),
+    })
+    dataset = Dataset.from_dict(data, features=features)
+
+    try:
+        scores = ragas_evaluate(
+            dataset,
+            metrics=[faithfulness, answer_relevancy, context_precision],
+            llm=judge_llm,
+            embeddings=embeddings,
+        )
+        result = {
+            "faithfulness":      round(float(scores["faithfulness"]), 3),
+            "answer_relevancy":  round(float(scores["answer_relevancy"]), 3),
+            "context_precision": round(float(scores["context_precision"]), 3),
+        }
+        print(f"\n  RAGAS scores")
+        print(f"  {'─' * 38}")
+        print(f"  {'Faithfulness':<28}  {result['faithfulness']:.3f}  (FAANG benchmark: >0.80)")
+        print(f"  {'Answer Relevancy':<28}  {result['answer_relevancy']:.3f}  (FAANG benchmark: >0.75)")
+        print(f"  {'Context Precision':<28}  {result['context_precision']:.3f}  (FAANG benchmark: >0.70)")
+        return result
+    except Exception as exc:
+        print(f"\n  [RAGAS] Evaluation failed: {exc}")
+        return None
+
+
 def run_evaluation(
     base_url: str,
     out_path: str | None,
     mode: str,
     use_semantic: bool,
     categories: list[str] | None,
+    run_ragas: bool = False,
 ) -> None:
     endpoint = f"{base_url.rstrip('/')}/chat"
 
@@ -442,7 +529,7 @@ def run_evaluation(
                 "ground_truth":  case["ground_truth"],
                 "answer":        answer,
                 "latency_ms":    response["latency_ms"],
-                "sources":       [{"source": s.get("source", ""), "score": s.get("score")} for s in sources],
+                "sources":       [{"source": s.get("source", ""), "score": s.get("score"), "text": s.get("text", "")} for s in sources],
                 "scores": {
                     "keyword_recall":       kw_score,
                     "ground_truth_overlap": gt_score,
@@ -481,6 +568,10 @@ def run_evaluation(
            if r["scores"]["semantic_similarity"] is not None]
     p95 = sorted(latencies)[min(int(len(latencies) * 0.95), len(latencies) - 1)]
 
+    ragas_scores = None
+    if run_ragas:
+        ragas_scores = run_ragas_eval(valid, HF_API_TOKEN)
+
     output = {
         "timestamp":          datetime.now().isoformat(),
         "target_url":         base_url,
@@ -500,6 +591,7 @@ def run_evaluation(
             "source_supported":     round(statistics.mean(src), 3),
             "semantic_similarity":  round(statistics.mean(sem), 3) if sem else None,
         },
+        "ragas_scores": ragas_scores,
         "overall_score": overall,
         "grade":         grade(overall),
         "per_query":     valid,
@@ -544,7 +636,21 @@ if __name__ == "__main__":
         choices=ALL_CATEGORIES,
         help=f"Only evaluate these categories: {ALL_CATEGORIES}",
     )
+    parser.add_argument(
+        "--ragas",
+        action="store_true",
+        help=(
+            "Run RAGAS faithfulness, answer relevancy, and context precision scoring "
+            "using Mistral-7B-Instruct via HuggingFace. "
+            "Requires: pip install ragas langchain-huggingface datasets"
+        ),
+    )
     args = parser.parse_args()
+
+    if args.ragas and not _RAGAS_AVAILABLE:
+        print("RAGAS is not installed. Run:\n")
+        print("  pip install ragas langchain-huggingface datasets\n")
+        raise SystemExit(1)
 
     print(f"Checking server at {args.url}...")
     try:
@@ -560,4 +666,5 @@ if __name__ == "__main__":
         mode=args.mode,
         use_semantic=not args.no_semantic,
         categories=args.categories,
+        run_ragas=args.ragas,
     )
