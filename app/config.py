@@ -45,7 +45,7 @@ def get_settings() -> Settings:
         if not val:
             raise RuntimeError(
                 f"Required environment variable '{key}' is missing or empty. "
-                "Set it in your .env file (local) or Azure App Service Application Settings (production)."
+                "Set it in your .env file (local) or the host's environment variables (production)."
             )
         return val
 

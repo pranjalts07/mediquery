@@ -6,9 +6,9 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![Pinecone](https://img.shields.io/badge/Pinecone-Vector_DB-6c47ff?style=flat-square)
 ![HuggingFace](https://img.shields.io/badge/HuggingFace-Inference_API-ff9d00?style=flat-square&logo=huggingface&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-App_Service-0078d4?style=flat-square&logo=microsoftazure&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Web_Service-46E3B7?style=flat-square&logo=render&logoColor=white)
 
-**[Live Demo](https://mediquery-app.azurewebsites.net)**
+**[Live Demo](https://mediquery-exxs.onrender.com)**
 
 <br/>
 
@@ -79,7 +79,7 @@ Run `python scripts/evaluate_mediquery.py --url <server>` to reproduce against a
 | Embeddings | `all-MiniLM-L6-v2` via HF Inference API |
 | Reranker | `ms-marco-MiniLM-L-6-v2` via HF Inference API |
 | LLM | `Llama-3.1-8B-Instruct` via Cerebras (HF) |
-| Deployment | Azure App Service |
+| Deployment | Render (Docker) |
 
 No LangChain — the full pipeline is about 200 lines of Python.
 

@@ -1,8 +1,8 @@
 #!/bin/bash
-# startup.sh — Azure Linux App Service startup script for MediQuery
+# startup.sh — container startup script for MediQuery
 #
 # gunicorn manages process lifecycle; uvicorn worker handles async ASGI requests.
-# Azure sets PORT; defaults to 8000 for local runs.
+# The host sets PORT; defaults to 8000 for local runs.
 
 set -e
 
