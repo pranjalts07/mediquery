@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 64" role="img" aria-label="A cursor clicks the Star button and it turns into Starred.">
+  <style>
+    .star { fill: #e3b341; fill-opacity: 0; animation: star 5s ease-in-out infinite; }
+    .burst { fill: #e3b341; opacity: 0; animation: burst 5s ease-out infinite; }
+    .before { animation: before 5s linear infinite; }
+    .after { opacity: 0; animation: after 5s linear infinite; }
+    .cursor { opacity: 0; animation: cursor 5s ease-in-out infinite; }
+    @keyframes star {
+      0%, 38% { fill-opacity: 0; stroke: #f0f6fc; transform: scale(1); }
+      46% { fill-opacity: 1; stroke: #e3b341; transform: scale(1.4); }
+      54%, 90% { fill-opacity: 1; stroke: #e3b341; transform: scale(1); }
+      100% { fill-opacity: 0; stroke: #f0f6fc; transform: scale(1); }
+    }
+    @keyframes burst {
+      0%, 38% { opacity: 0; transform: scale(.6); }
+      46% { opacity: 1; transform: scale(1); }
+      52% { opacity: 1; transform: scale(1.1); }
+      64%, 100% { opacity: 0; transform: scale(1.2); }
+    }
+    @keyframes before { 0%, 38% { opacity: 1; } 40%, 92% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes after { 0%, 38% { opacity: 0; } 40%, 92% { opacity: 1; } 100% { opacity: 0; } }
+    @keyframes cursor {
+      0% { opacity: 0; transform: translate(34px, 8px); }
+      8% { opacity: 1; transform: translate(34px, 8px); }
+      32% { opacity: 1; transform: translate(0, 0) scale(1); }
+      36% { opacity: 1; transform: scale(.8); }
+      40%, 75% { opacity: 1; transform: translate(0, 0) scale(1); }
+      85%, 100% { opacity: 0; transform: translate(34px, 8px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .star, .burst, .before, .after, .cursor { animation: none; } }
+  </style>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <rect width="330" height="64" rx="10" fill="#161b22"/>
+    <text x="16" y="28" font-size="14" font-weight="700" fill="#f0f6fc">Please star the repo.</text>
+    <text x="16" y="45" font-size="11" fill="#9198a1">It helps others find this project.</text>
+    <rect x="212.5" y="12.5" width="105" height="39" rx="7" fill="#21262d" stroke="#3d444d"/>
+    <g transform="translate(232 32)"><g class="burst"><circle cx="15" cy="0" r="1.7"/><circle cx="10.6" cy="10.6" r="1.7"/><circle cx="0" cy="15" r="1.7"/><circle cx="-10.6" cy="10.6" r="1.7"/><circle cx="-15" cy="0" r="1.7"/><circle cx="-10.6" cy="-10.6" r="1.7"/><circle cx="0" cy="-15" r="1.7"/><circle cx="10.6" cy="-10.6" r="1.7"/></g><polygon class="star" points="0,-9 2.35,-3.24 8.56,-2.78 3.8,1.24 5.29,7.28 0,4 -5.29,7.28 -3.8,1.24 -8.56,-2.78 -2.35,-3.24" stroke="#f0f6fc" stroke-width="1.5" stroke-linejoin="round"/></g>
+    <text class="before" x="250" y="36.5" font-size="13" font-weight="600" fill="#f0f6fc">Star</text>
+    <text class="after" x="250" y="36.5" font-size="13" font-weight="600" fill="#f0f6fc">Starred</text>
+    <g transform="translate(237 36)"><path class="cursor" d="M0 0 L0 15 L3.6 11.6 L6.2 17.4 L8.6 16.3 L6 10.7 L11 10.7 Z" fill="#1f2328" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/></g>
+  </g>
+</svg>

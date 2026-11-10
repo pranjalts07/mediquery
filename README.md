@@ -20,6 +20,15 @@
 
 A medical question-answering system built on a two-stage retrieval pipeline. Questions are answered using real PubMed abstracts and medical literature — not just what the model already knows.
 
+<p align="center">
+  <a href="https://github.com/pranjalts07/mediquery/stargazers">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/star-dark.svg">
+      <img src="assets/star-light.svg" alt="Please star the repo" width="400">
+    </picture>
+  </a>
+</p>
+
 ## How it works
 
 ```
